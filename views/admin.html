@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>OHM HIVE - Admin Panel</title>
+  <link rel="icon" type="image/png" href="/images/logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -359,12 +360,166 @@
 
     .pdf-buttons { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
 
+    /* Responsive Design */
+    @media (max-width: 992px) {
+      .admin-header {
+        flex-direction: column;
+        gap: 15px;
+        padding: 15px;
+      }
+      .admin-actions {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .stat-card .value { font-size: 1.5rem; }
+    }
+
     @media (max-width: 768px) {
-      .admin-header { flex-direction: column; gap: 15px; }
-      .orders-table { display: block; overflow-x: auto; }
-      .filters { flex-direction: column; }
-      .lang-switcher { top: 10px; right: 10px; }
-      body[dir="rtl"] .lang-switcher { left: 10px; right: auto; }
+      .admin-content { padding: 15px; }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+      }
+      .stat-card {
+        padding: 15px;
+      }
+      .stat-card h3 { font-size: 0.8rem; }
+      .stat-card .value { font-size: 1.3rem; }
+
+      .filters {
+        flex-direction: column;
+        gap: 10px;
+      }
+      .filter-group {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .filter-group select,
+      .filter-group input {
+        width: 100%;
+      }
+
+      /* Mobile table - card style */
+      .orders-table { display: block; }
+      .orders-table thead { display: none; }
+      .orders-table tbody { display: block; }
+      .orders-table tr {
+        display: block;
+        margin-bottom: 15px;
+        padding: 15px;
+        background: var(--dark-charcoal);
+        border-radius: 10px;
+        border: 1px solid rgba(245, 166, 35, 0.2);
+      }
+      .orders-table tr:hover {
+        background: var(--dark-charcoal);
+        transform: none;
+      }
+      .orders-table td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(245, 166, 35, 0.1);
+      }
+      .orders-table td:last-child { border-bottom: none; }
+      .orders-table td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: var(--honey-gold);
+        font-size: 0.8rem;
+        text-transform: uppercase;
+      }
+      body[dir="rtl"] .orders-table td {
+        flex-direction: row-reverse;
+      }
+
+      .action-btns {
+        flex-wrap: wrap;
+        gap: 5px;
+        justify-content: flex-end;
+      }
+      .action-btn {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+      }
+
+      .admin-actions {
+        width: 100%;
+        gap: 10px;
+      }
+      .admin-actions .btn {
+        flex: 1;
+        justify-content: center;
+        padding: 10px 12px;
+        font-size: 0.85rem;
+      }
+      .admin-user {
+        width: 100%;
+        text-align: center;
+        order: -1;
+        margin-bottom: 5px;
+      }
+      .lang-switcher { order: -2; }
+
+      /* Modal responsive */
+      .modal-content {
+        margin: 10px;
+        max-height: calc(100vh - 20px);
+      }
+      .modal-header { padding: 15px; }
+      .modal-body { padding: 15px; }
+      .detail-section { padding: 15px; }
+      .detail-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+      }
+      body[dir="rtl"] .detail-row {
+        align-items: flex-end;
+      }
+      .status-update, .cost-update {
+        flex-direction: column;
+        gap: 10px;
+      }
+      .status-update select,
+      .cost-update input {
+        width: 100%;
+      }
+      .pdf-buttons {
+        flex-direction: column;
+        gap: 10px;
+      }
+      .pdf-buttons .btn { width: 100%; justify-content: center; }
+    }
+
+    @media (max-width: 480px) {
+      .login-box { padding: 25px 20px; }
+      .login-logo h1 { font-size: 1.6rem; }
+
+      .stats-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .stat-card { padding: 12px; }
+      .stat-card h3 { font-size: 0.7rem; }
+      .stat-card .value { font-size: 1.1rem; }
+
+      .admin-logo h1 { font-size: 1.2rem; }
+      .admin-logo span { font-size: 0.8rem; }
+
+      .orders-header h2 { font-size: 1.1rem; }
+
+      .btn {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+      }
+
+      .lang-btn {
+        padding: 6px 10px;
+        font-size: 0.85rem;
+      }
     }
 
     @media print {
@@ -837,13 +992,13 @@
           <tbody>
             ${orders.map(order => `
               <tr>
-                <td><strong>${order.order_number}</strong></td>
-                <td>${order.first_name} ${order.last_name}<br><small style="color: rgba(255,248,240,0.5)">${order.phone}</small></td>
-                <td>${getServiceLabel(order.service_type)}</td>
-                <td>${formatDate(order.created_at)}</td>
-                <td>${order.total_cost ? order.total_cost + ' SAR' : `<span style="color: var(--electric-blue)">${t('tbd')}</span>`}</td>
-                <td><span class="status-badge status-${order.status}">${getStatusLabel(order.status)}</span></td>
-                <td>
+                <td data-label="${t('orderNumber')}"><strong>${order.order_number}</strong></td>
+                <td data-label="${t('customer')}">${order.first_name} ${order.last_name}<br><small style="color: rgba(255,248,240,0.5)">${order.phone}</small></td>
+                <td data-label="${t('service')}">${getServiceLabel(order.service_type)}</td>
+                <td data-label="${t('date')}">${formatDate(order.created_at)}</td>
+                <td data-label="${t('total')}">${order.total_cost ? order.total_cost + ' SAR' : `<span style="color: var(--electric-blue)">${t('tbd')}</span>`}</td>
+                <td data-label="${t('status')}"><span class="status-badge status-${order.status}">${getStatusLabel(order.status)}</span></td>
+                <td data-label="${t('actions')}">
                   <div class="action-btns">
                     <button class="action-btn view" onclick="viewOrder('${order.order_number}')">${t('view')}</button>
                     <button class="action-btn print" onclick="printOrder('${order.order_number}')">${t('print')}</button>
