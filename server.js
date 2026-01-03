@@ -456,7 +456,7 @@ app.get('/api/orders/:orderNumber/pdf', async (req, res) => {
         term1: '- Payment: 50% before start, 50% upon completion',
         term2: '- Components cost not included in service fee',
         term3: '- Late delivery: 200 SAR deduction per day',
-        term4: '- One free revision included',
+        term4: '- One free adjustment included',
         signature: 'CUSTOMER SIGNATURE:',
         footer1: 'This is an electronically generated receipt. By submitting this order, the customer has agreed to all Terms and Conditions.',
         footer2: 'Generated on: ',
@@ -472,7 +472,7 @@ app.get('/api/orders/:orderNumber/pdf', async (req, res) => {
         statuses: { pending: 'PENDING', confirmed: 'CONFIRMED', 'in-progress': 'IN PROGRESS', completed: 'COMPLETED', cancelled: 'CANCELLED' }
       },
       ar: {
-        tagline: 'حيث الأفكار تنبض بالحياة',
+        tagline: 'حيث تنبض الأفكار بالحياة',
         contact: 'واتساب: 0536113736 | خدمات هندسية للطلاب',
         receipt: 'إيصال الطلب',
         orderNumber: 'رقم الطلب',
@@ -485,23 +485,23 @@ app.get('/api/orders/:orderNumber/pdf', async (req, res) => {
         serviceType: 'نوع الخدمة:',
         costBreakdown: 'تفاصيل التكلفة',
         total: 'الإجمالي:',
-        tbd: 'سيتم تحديدها لاحقاً من قبل المهندس',
+        tbd: 'سيتم تحديدها لاحقاً',
         keyTerms: 'الشروط الأساسية:',
         term1: '- الدفع: 50% قبل البدء، 50% عند الاستلام',
-        term2: '- تكلفة المكونات غير مشمولة في رسوم الخدمة',
-        term3: '- التأخير: خصم 200 ريال لكل يوم تأخير',
-        term4: '- مراجعة واحدة مجانية مشمولة',
+        term2: '- تكلفة المكونات غير مشمولة',
+        term3: '- التأخير: تعويض 200 ريال لكل يوم',
+        term4: '- تعديل واحد مجاني مشمول',
         signature: 'توقيع العميل:',
-        footer1: 'هذا إيصال إلكتروني. بتقديم هذا الطلب، وافق العميل على جميع الشروط والأحكام.',
+        footer1: 'إيصال إلكتروني. بتقديم الطلب وافق العميل على الشروط والأحكام.',
         footer2: 'تاريخ الإصدار: ',
         services: {
-          'course-project': 'مشروع مادة',
-          'senior-project': 'مشروع التخرج',
+          'course-project': 'مشروع مقرر',
+          'senior-project': 'مشروع تخرج',
           'consulting': 'استشارات',
           'supervision': 'متابعة مشاريع التخرج',
-          '3d-modeling': 'نمذجة ثلاثية الأبعاد',
+          '3d-modeling': 'تصميم ثلاثي الأبعاد',
           '3d-printing': 'طباعة ثلاثية الأبعاد',
-          'homework': 'واجبات دراسية'
+          'homework': 'واجبات المقررات'
         },
         statuses: { pending: 'قيد الانتظار', confirmed: 'مؤكد', 'in-progress': 'قيد التنفيذ', completed: 'مكتمل', cancelled: 'ملغي' }
       }
@@ -518,6 +518,21 @@ app.get('/api/orders/:orderNumber/pdf', async (req, res) => {
     const qrCodeDataUrl = await QRCode.toDataURL(qrData, { width: 100, margin: 1 });
 
     const doc = new PDFDocument({ margin: 50, size: 'A4' });
+
+    // Register Arabic fonts
+    const amiriRegular = path.join(__dirname, 'fonts', 'Amiri-Regular.ttf');
+    const amiriBold = path.join(__dirname, 'fonts', 'Amiri-Bold.ttf');
+    if (fs.existsSync(amiriRegular)) {
+      doc.registerFont('Amiri', amiriRegular);
+    }
+    if (fs.existsSync(amiriBold)) {
+      doc.registerFont('Amiri-Bold', amiriBold);
+    }
+
+    // Font helpers
+    const fontRegular = isArabic ? 'Amiri' : 'Helvetica';
+    const fontBold = isArabic ? 'Amiri-Bold' : 'Helvetica-Bold';
+    const textAlign = isArabic ? 'right' : 'left';
 
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename=OhmHive-${order.order_number}-${lang}.pdf`);
@@ -536,58 +551,73 @@ app.get('/api/orders/:orderNumber/pdf', async (req, res) => {
     const logoPath = path.join(__dirname, 'public', 'images', 'logo.png');
     if (fs.existsSync(logoPath)) {
       try {
-        doc.image(logoPath, 50, 25, { width: 60 });
+        doc.image(logoPath, isArabic ? 502 : 50, 25, { width: 60 });
       } catch (e) {}
     }
 
     // Header text
-    doc.fillColor('#FFFFFF').fontSize(28).font('Helvetica-Bold').text('OHM HIVE', 120, 30);
-    doc.fillColor(honeyGold).fontSize(11).font('Helvetica').text(tr.tagline, 120, 62);
-    doc.fillColor('#AAAAAA').fontSize(9).text(tr.contact, 120, 80);
+    const headerX = isArabic ? 50 : 120;
+    const headerWidth = isArabic ? 440 : 350;
+    doc.fillColor('#FFFFFF').fontSize(28).font(fontBold).text('OHM HIVE', headerX, 30, { align: textAlign, width: headerWidth });
+    doc.fillColor(honeyGold).fontSize(12).font(fontRegular).text(tr.tagline, headerX, 65, { align: textAlign, width: headerWidth });
+    doc.fillColor('#AAAAAA').fontSize(9).text(tr.contact, headerX, 85, { align: textAlign, width: headerWidth });
 
     // QR Code in header
     try {
-      doc.image(qrCodeDataUrl, 480, 20, { width: 80 });
+      doc.image(qrCodeDataUrl, isArabic ? 50 : 480, 20, { width: 80 });
     } catch (e) {}
 
     // Receipt title bar
     doc.rect(0, 120, 612, 35).fill(honeyGold);
-    doc.fillColor(darkCharcoal).fontSize(16).font('Helvetica-Bold').text(tr.receipt, 50, 128, { align: 'center', width: 512 });
+    doc.fillColor(darkCharcoal).fontSize(16).font(fontBold).text(tr.receipt, 50, 128, { align: 'center', width: 512 });
 
     // Order number box
-    doc.rect(50, 175, 250, 50).lineWidth(2).stroke(honeyGold);
-    doc.fillColor(darkCharcoal).fontSize(10).font('Helvetica').text(tr.orderNumber, 60, 182);
-    doc.fillColor(honeyGold).fontSize(18).font('Helvetica-Bold').text(order.order_number, 60, 198);
+    const leftBoxX = isArabic ? 312 : 50;
+    const rightBoxX = isArabic ? 50 : 312;
+    doc.rect(leftBoxX, 175, 250, 50).lineWidth(2).stroke(honeyGold);
+    doc.fillColor(darkCharcoal).fontSize(10).font(fontRegular).text(tr.orderNumber, leftBoxX + 10, 182, { align: textAlign, width: 230 });
+    doc.fillColor(honeyGold).fontSize(18).font(fontBold).text(order.order_number, leftBoxX + 10, 198, { align: textAlign, width: 230 });
 
     // Date and status box
-    doc.rect(312, 175, 250, 50).lineWidth(2).stroke(electricBlue);
-    doc.fillColor(darkCharcoal).fontSize(10).font('Helvetica').text(tr.dateStatus, 322, 182);
+    doc.rect(rightBoxX, 175, 250, 50).lineWidth(2).stroke(electricBlue);
+    doc.fillColor(darkCharcoal).fontSize(10).font(fontRegular).text(tr.dateStatus, rightBoxX + 10, 182, { align: textAlign, width: 230 });
     const dateLocale = isArabic ? 'ar-SA' : 'en-US';
     const orderDate = order.created_at ? new Date(order.created_at).toLocaleDateString(dateLocale, { year: 'numeric', month: 'short', day: 'numeric' }) : 'N/A';
     const statusText = tr.statuses[order.status] || (order.status || 'PENDING').toUpperCase();
-    doc.fillColor(electricBlue).fontSize(14).font('Helvetica-Bold').text(orderDate + ' | ' + statusText, 322, 198);
+    doc.fillColor(electricBlue).fontSize(12).font(fontBold).text(orderDate + ' | ' + statusText, rightBoxX + 10, 200, { align: textAlign, width: 230 });
 
     // Customer Information Section
     doc.rect(50, 245, 512, 80).lineWidth(1).stroke('#DDDDDD');
     doc.rect(50, 245, 512, 25).fill('#F5F5F5');
-    doc.fillColor(darkCharcoal).fontSize(12).font('Helvetica-Bold').text(tr.customerInfo, 60, 252);
+    doc.fillColor(darkCharcoal).fontSize(12).font(fontBold).text(tr.customerInfo, 60, 252, { align: textAlign, width: 492 });
 
-    doc.fillColor('#333333').fontSize(10).font('Helvetica');
-    doc.text(tr.name, 60, 280);
-    doc.font('Helvetica-Bold').text(order.first_name + ' ' + order.last_name, 120, 280);
-    doc.font('Helvetica').text(tr.phone, 300, 280);
-    doc.font('Helvetica-Bold').text(order.phone, 360, 280);
-    doc.font('Helvetica').text(tr.email, 60, 300);
-    doc.font('Helvetica-Bold').text(order.email, 120, 300);
+    doc.fillColor('#333333').fontSize(10).font(fontRegular);
+    if (isArabic) {
+      doc.text(order.first_name + ' ' + order.last_name + ' :' + tr.name.replace(':', ''), 60, 280, { align: 'right', width: 492 });
+      doc.text(order.phone + ' :' + tr.phone.replace(':', ''), 60, 298, { align: 'right', width: 492 });
+      doc.text(order.email + ' :' + tr.email.replace(':', ''), 60, 316, { align: 'right', width: 492 });
+    } else {
+      doc.text(tr.name, 60, 280);
+      doc.font(fontBold).text(order.first_name + ' ' + order.last_name, 120, 280);
+      doc.font(fontRegular).text(tr.phone, 300, 280);
+      doc.font(fontBold).text(order.phone, 360, 280);
+      doc.font(fontRegular).text(tr.email, 60, 300);
+      doc.font(fontBold).text(order.email, 120, 300);
+    }
 
     // Service Details Section
     doc.rect(50, 345, 512, 100).lineWidth(1).stroke('#DDDDDD');
     doc.rect(50, 345, 512, 25).fill(honeyGold);
-    doc.fillColor('#FFFFFF').fontSize(12).font('Helvetica-Bold').text(tr.serviceDetails, 60, 352);
+    doc.fillColor('#FFFFFF').fontSize(12).font(fontBold).text(tr.serviceDetails, 60, 352, { align: textAlign, width: 492 });
 
-    doc.fillColor('#333333').fontSize(10).font('Helvetica');
-    doc.text(tr.serviceType, 60, 380);
-    doc.font('Helvetica-Bold').fillColor(honeyGold).text(tr.services[order.service_type] || order.service_type, 150, 380);
+    doc.fillColor('#333333').fontSize(10).font(fontRegular);
+    const serviceLabel = tr.services[order.service_type] || order.service_type;
+    if (isArabic) {
+      doc.fillColor(honeyGold).font(fontBold).text(serviceLabel + ' :' + tr.serviceType.replace(':', ''), 60, 380, { align: 'right', width: 492 });
+    } else {
+      doc.text(tr.serviceType, 60, 380);
+      doc.font(fontBold).fillColor(honeyGold).text(serviceLabel, 150, 380);
+    }
 
     let yPos = 400;
     doc.fillColor('#333333');
@@ -595,8 +625,12 @@ app.get('/api/orders/:orderNumber/pdf', async (req, res) => {
       if (value && key !== 'files' && yPos < 440) {
         const formattedKey = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
         const displayValue = Array.isArray(value) ? value.join(', ') : String(value);
-        doc.font('Helvetica').text(formattedKey + ':', 60, yPos);
-        doc.font('Helvetica-Bold').text(displayValue.substring(0, 60), 180, yPos);
+        if (isArabic) {
+          doc.font(fontRegular).text(displayValue.substring(0, 50) + ' :' + formattedKey, 60, yPos, { align: 'right', width: 492 });
+        } else {
+          doc.font(fontRegular).text(formattedKey + ':', 60, yPos);
+          doc.font(fontBold).text(displayValue.substring(0, 60), 180, yPos);
+        }
         yPos += 18;
       }
     }
@@ -604,54 +638,70 @@ app.get('/api/orders/:orderNumber/pdf', async (req, res) => {
     // Cost Breakdown Section
     doc.rect(50, 465, 512, 100).lineWidth(1).stroke('#DDDDDD');
     doc.rect(50, 465, 512, 25).fill(electricBlue);
-    doc.fillColor('#FFFFFF').fontSize(12).font('Helvetica-Bold').text(tr.costBreakdown, 60, 472);
+    doc.fillColor('#FFFFFF').fontSize(12).font(fontBold).text(tr.costBreakdown, 60, 472, { align: textAlign, width: 492 });
 
     yPos = 500;
     doc.fillColor('#333333').fontSize(10);
     for (const [key, value] of Object.entries(calculatedCosts)) {
       if (value && typeof value === 'number' && value > 0 && yPos < 550) {
         const formattedKey = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
-        doc.font('Helvetica').text(formattedKey, 60, yPos);
-        doc.font('Helvetica-Bold').text(value + ' SAR', 450, yPos, { align: 'right', width: 100 });
+        if (isArabic) {
+          doc.font(fontBold).text('SAR ' + value, 60, yPos);
+          doc.font(fontRegular).text(formattedKey, 200, yPos, { align: 'right', width: 350 });
+        } else {
+          doc.font(fontRegular).text(formattedKey, 60, yPos);
+          doc.font(fontBold).text(value + ' SAR', 450, yPos, { align: 'right', width: 100 });
+        }
         yPos += 18;
       }
     }
 
     // Total line
     doc.moveTo(50, 555).lineTo(562, 555).lineWidth(2).stroke(honeyGold);
-    doc.fontSize(14).font('Helvetica-Bold');
-    doc.fillColor(darkCharcoal).text(tr.total, 60, 562);
-    if (order.total_cost) {
-      doc.fillColor(honeyGold).text(order.total_cost + ' SAR', 400, 562, { align: 'right', width: 150 });
+    doc.fontSize(14).font(fontBold);
+    if (isArabic) {
+      if (order.total_cost) {
+        doc.fillColor(honeyGold).text('SAR ' + order.total_cost, 60, 562);
+      } else {
+        doc.fillColor(electricBlue).fontSize(11).text(tr.tbd, 60, 564);
+      }
+      doc.fillColor(darkCharcoal).fontSize(14).text(tr.total, 400, 562, { align: 'right', width: 150 });
     } else {
-      doc.fillColor(electricBlue).fontSize(11).text(tr.tbd, 250, 564, { align: 'right', width: 300 });
+      doc.fillColor(darkCharcoal).text(tr.total, 60, 562);
+      if (order.total_cost) {
+        doc.fillColor(honeyGold).text(order.total_cost + ' SAR', 400, 562, { align: 'right', width: 150 });
+      } else {
+        doc.fillColor(electricBlue).fontSize(11).text(tr.tbd, 250, 564, { align: 'right', width: 300 });
+      }
     }
 
     // Terms box
-    doc.rect(50, 590, 350, 80).lineWidth(1).stroke('#DDDDDD').fill('#FAFAFA');
-    doc.fillColor('#666666').fontSize(8).font('Helvetica-Bold').text(tr.keyTerms, 58, 598);
-    doc.font('Helvetica').fontSize(7);
-    doc.text(tr.term1, 58, 612);
-    doc.text(tr.term2, 58, 624);
-    doc.text(tr.term3, 58, 636);
-    doc.text(tr.term4, 58, 648);
+    const termsBoxX = isArabic ? 210 : 50;
+    doc.rect(termsBoxX, 590, 350, 80).lineWidth(1).stroke('#DDDDDD').fill('#FAFAFA');
+    doc.fillColor('#666666').fontSize(9).font(fontBold).text(tr.keyTerms, termsBoxX + 8, 598, { align: textAlign, width: 334 });
+    doc.font(fontRegular).fontSize(8);
+    doc.text(tr.term1, termsBoxX + 8, 614, { align: textAlign, width: 334 });
+    doc.text(tr.term2, termsBoxX + 8, 628, { align: textAlign, width: 334 });
+    doc.text(tr.term3, termsBoxX + 8, 642, { align: textAlign, width: 334 });
+    doc.text(tr.term4, termsBoxX + 8, 656, { align: textAlign, width: 334 });
 
     // Signature box
+    const sigBoxX = isArabic ? 50 : 420;
     if (order.signature && order.signature.startsWith('data:image')) {
-      doc.rect(420, 590, 142, 80).lineWidth(1).stroke('#DDDDDD');
-      doc.fillColor('#666666').fontSize(8).font('Helvetica-Bold').text(tr.signature, 428, 598);
+      doc.rect(sigBoxX, 590, 142, 80).lineWidth(1).stroke('#DDDDDD');
+      doc.fillColor('#666666').fontSize(9).font(fontBold).text(tr.signature, sigBoxX + 8, 598, { align: textAlign, width: 126 });
       try {
-        doc.image(order.signature, 430, 612, { width: 120, height: 50 });
+        doc.image(order.signature, sigBoxX + 10, 615, { width: 120, height: 50 });
       } catch (e) {
-        doc.text('[Signature on file]', 430, 630);
+        doc.font(fontRegular).text('[Signature on file]', sigBoxX + 10, 635);
       }
     }
 
     // Footer
     doc.rect(0, 700, 612, 92).fill(darkCharcoal);
-    doc.fillColor('#AAAAAA').fontSize(8).font('Helvetica');
-    doc.text(tr.footer1, 50, 712, { align: 'center', width: 512 });
-    doc.text(tr.footer2 + new Date().toLocaleString(dateLocale) + ' | OHM HIVE - ' + tr.tagline, 50, 728, { align: 'center', width: 512 });
+    doc.fillColor('#AAAAAA').fontSize(9).font(fontRegular);
+    doc.text(tr.footer1, 50, 715, { align: 'center', width: 512 });
+    doc.text(tr.footer2 + new Date().toLocaleDateString(dateLocale) + ' | OHM HIVE', 50, 735, { align: 'center', width: 512 });
 
     doc.end();
   } catch (error) {
