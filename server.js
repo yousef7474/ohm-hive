@@ -30,7 +30,7 @@ async function sendTelegramNotification(order, serviceDetails) {
     'course-project': 'Course Project',
     'senior-project': 'Senior Project',
     'consulting': 'Consulting',
-    'supervision': 'Senior Design Supervision',
+    'supervision': 'Senior Project Follow-up',
     '3d-modeling': '3D Modeling',
     '3d-printing': '3D Printing',
     'homework': 'Homework for Courses'
@@ -464,7 +464,7 @@ app.get('/api/orders/:orderNumber/pdf', async (req, res) => {
           'course-project': 'Course Project',
           'senior-project': 'Senior Project',
           'consulting': 'Consulting',
-          'supervision': 'Senior Design Supervision',
+          'supervision': 'Senior Project Follow-up',
           '3d-modeling': '3D Modeling',
           '3d-printing': '3D Printing',
           'homework': 'Homework for Courses'
@@ -498,7 +498,7 @@ app.get('/api/orders/:orderNumber/pdf', async (req, res) => {
           'course-project': 'مشروع مادة',
           'senior-project': 'مشروع التخرج',
           'consulting': 'استشارات',
-          'supervision': 'إشراف على مشروع التخرج',
+          'supervision': 'متابعة مشاريع التخرج',
           '3d-modeling': 'نمذجة ثلاثية الأبعاد',
           '3d-printing': 'طباعة ثلاثية الأبعاد',
           'homework': 'واجبات دراسية'

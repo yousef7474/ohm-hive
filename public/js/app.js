@@ -535,7 +535,7 @@ function updateCostSummary() {
                   key === 'report' ? (currentLang === 'ar' ? 'تقرير' : 'Report') :
                   key === 'ppt' ? (currentLang === 'ar' ? 'عرض تقديمي' : 'Presentation') :
                   key === 'consulting' ? (currentLang === 'ar' ? 'استشارات' : 'Consulting') :
-                  key === 'supervision' ? (currentLang === 'ar' ? 'إشراف' : 'Supervision') : key;
+                  key === 'supervision' ? (currentLang === 'ar' ? 'متابعة' : 'Follow-up') : key;
 
     if (typeof value === 'number') {
       html += `<div class="cost-item"><span>${label}</span><span>${value} SAR</span></div>`;
@@ -856,7 +856,7 @@ function showConfirmation(orderNumber, serviceType, details, costs) {
       const label = key === 'report' ? (currentLang === 'ar' ? 'تقرير' : 'Report') :
                     key === 'ppt' ? (currentLang === 'ar' ? 'عرض تقديمي' : 'Presentation') :
                     key === 'consulting' ? (currentLang === 'ar' ? 'استشارات' : 'Consulting') :
-                    key === 'supervision' ? (currentLang === 'ar' ? 'إشراف' : 'Supervision') : key;
+                    key === 'supervision' ? (currentLang === 'ar' ? 'متابعة' : 'Follow-up') : key;
       html += `<div class="receipt-item"><span>${label}</span><span>${value} SAR</span></div>`;
     }
   }
