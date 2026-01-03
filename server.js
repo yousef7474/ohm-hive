@@ -293,6 +293,9 @@ app.post('/api/orders', upload.array('files', 5), (req, res) => {
 
     const orderNumber = generateOrderNumber();
 
+    // Parse totalCost - convert string to number, handle empty string
+    const parsedTotalCost = totalCost && totalCost !== '' ? parseFloat(totalCost) : null;
+
     db.run(`
       INSERT INTO orders (order_number, first_name, last_name, phone, email, service_type, service_details, calculated_costs, total_cost, signature)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -305,7 +308,7 @@ app.post('/api/orders', upload.array('files', 5), (req, res) => {
       serviceType,
       serviceDetails,
       calculatedCosts,
-      totalCost || null,
+      parsedTotalCost,
       signature
     ]);
 
@@ -331,7 +334,7 @@ app.post('/api/orders', upload.array('files', 5), (req, res) => {
       phone,
       email,
       serviceType,
-      totalCost
+      totalCost: parsedTotalCost
     }).catch(err => console.error('Telegram notification error:', err));
 
     res.json({
