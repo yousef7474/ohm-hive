@@ -667,8 +667,8 @@ function initFormSubmission() {
     // Collect service details
     const serviceDetails = collectServiceDetails(serviceType);
 
-    // Collect calculated costs
-    const calculatedCosts = collectCalculatedCosts(serviceType);
+    // Collect calculated costs and total
+    const { costs: calculatedCosts, total: totalCost } = collectCalculatedCosts(serviceType);
 
     // Get signature
     const signature = signaturePad ? signaturePad.toDataURL() : null;
@@ -682,6 +682,7 @@ function initFormSubmission() {
     submitData.append('serviceType', serviceType);
     submitData.append('serviceDetails', JSON.stringify(serviceDetails));
     submitData.append('calculatedCosts', JSON.stringify(calculatedCosts));
+    submitData.append('totalCost', totalCost || '');
     submitData.append('signature', signature);
 
     // Add files if any
@@ -707,7 +708,7 @@ function initFormSubmission() {
       const result = await response.json();
 
       if (result.success) {
-        showConfirmation(result.orderNumber, serviceType, serviceDetails, calculatedCosts);
+        showConfirmation(result.orderNumber, serviceType, serviceDetails, calculatedCosts, totalCost);
         form.reset();
         document.getElementById('serviceFields').innerHTML = '';
         document.getElementById('costSummary').style.display = 'none';
@@ -802,45 +803,64 @@ function collectServiceDetails(serviceType) {
   return details;
 }
 
-// Collect calculated costs
+// Collect calculated costs and total
 function collectCalculatedCosts(serviceType) {
   const costs = {};
+  let total = null; // null means TBD
 
   switch (serviceType) {
     case 'course-project':
+      // Base cost is TBD, only extras are calculated
       if (document.querySelector('input[name="reportRequired"]:checked')?.value === 'yes') {
         costs.report = 700;
       }
       if (document.querySelector('input[name="pptRequired"]:checked')?.value === 'yes') {
         costs.ppt = 250;
       }
+      // Total remains null (TBD) because base project cost is unknown
       break;
 
     case 'senior-project':
+      // Base cost is TBD, only extras are calculated
       if (document.querySelector('input[name="reportRequired"]:checked')?.value === 'yes') {
         costs.report = 1200;
       }
       if (document.querySelector('input[name="pptRequired"]:checked')?.value === 'yes') {
         costs.ppt = 400;
       }
+      // Total remains null (TBD) because base project cost is unknown
       break;
 
     case 'consulting':
       const hours = parseInt(document.getElementById('consultingHours')?.value) || 1;
       costs.consulting = hours * 80;
+      total = costs.consulting; // Fixed rate, total is known
       break;
 
     case 'supervision':
       const supervisionMonths = parseInt(document.querySelector('input[name="supervisionPeriod"]:checked')?.value) || 1;
       costs.supervision = supervisionPrices[supervisionMonths] || 2500;
+      total = costs.supervision; // Fixed rate, total is known
+      break;
+
+    case '3d-modeling':
+      // Total is TBD - engineer needs to evaluate
+      break;
+
+    case '3d-printing':
+      // Total is TBD - weight needs to be calculated
+      break;
+
+    case 'homework':
+      // Total is TBD - engineer needs to evaluate
       break;
   }
 
-  return costs;
+  return { costs, total };
 }
 
 // Show confirmation modal
-function showConfirmation(orderNumber, serviceType, details, costs) {
+function showConfirmation(orderNumber, serviceType, details, costs, totalCost) {
   const modal = document.getElementById('confirmationModal');
   const orderNumberDisplay = document.getElementById('displayOrderNumber');
   const receiptSummary = document.getElementById('receiptSummary');
@@ -859,6 +879,13 @@ function showConfirmation(orderNumber, serviceType, details, costs) {
                     key === 'supervision' ? (currentLang === 'ar' ? 'متابعة' : 'Follow-up') : key;
       html += `<div class="receipt-item"><span>${label}</span><span>${value} SAR</span></div>`;
     }
+  }
+
+  // Show total
+  if (totalCost) {
+    html += `<div class="receipt-item" style="border-top: 1px solid var(--honey-gold); padding-top: 10px; margin-top: 10px;"><span><strong>${currentLang === 'ar' ? 'الإجمالي' : 'Total'}</strong></span><span><strong>${totalCost} SAR</strong></span></div>`;
+  } else {
+    html += `<div class="receipt-item" style="border-top: 1px solid var(--honey-gold); padding-top: 10px; margin-top: 10px;"><span><strong>${currentLang === 'ar' ? 'الإجمالي' : 'Total'}</strong></span><span style="color: var(--electric-blue);">${currentLang === 'ar' ? 'سيتم تحديده' : 'TBD'}</span></div>`;
   }
 
   receiptSummary.innerHTML = html;
