@@ -270,3 +270,348 @@
   position: relative;
   z-index: 10;
 }
+
+/* ==========================================
+   HERO SECTION SPECIFIC ANIMATIONS
+   ========================================== */
+
+/* Animated gradient background for hero */
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    45deg,
+    rgba(245, 166, 35, 0.1) 0%,
+    transparent 50%,
+    rgba(45, 156, 219, 0.1) 100%
+  );
+  background-size: 400% 400%;
+  animation: gradient-shift 15s ease infinite;
+  z-index: -1;
+}
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Floating code symbols around title */
+.hero-content {
+  position: relative;
+}
+
+.hero-content::before,
+.hero-content::after {
+  position: absolute;
+  font-family: monospace;
+  font-size: 1.5rem;
+  opacity: 0.15;
+  animation: code-float 8s ease-in-out infinite;
+  color: var(--honey-gold);
+}
+
+.hero-content::before {
+  content: '< / >';
+  top: -20px;
+  left: -50px;
+  animation-delay: 0s;
+}
+
+.hero-content::after {
+  content: '{ }';
+  bottom: -20px;
+  right: -50px;
+  animation-delay: 4s;
+}
+
+@keyframes code-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.15; }
+  50% { transform: translateY(-20px) rotate(5deg); opacity: 0.3; }
+}
+
+/* Pulsing glow behind title */
+.hero h1 {
+  position: relative;
+  text-shadow: 0 0 60px rgba(245, 166, 35, 0.5);
+  animation: title-glow 3s ease-in-out infinite;
+}
+
+@keyframes title-glow {
+  0%, 100% { text-shadow: 0 0 60px rgba(245, 166, 35, 0.3); }
+  50% { text-shadow: 0 0 80px rgba(245, 166, 35, 0.6), 0 0 120px rgba(245, 166, 35, 0.3); }
+}
+
+/* Animated underline for tagline */
+.hero .tagline {
+  position: relative;
+}
+
+.hero .tagline::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--honey-gold), transparent);
+  animation: underline-expand 4s ease-in-out infinite;
+}
+
+@keyframes underline-expand {
+  0%, 100% { width: 0; opacity: 0; }
+  50% { width: 200px; opacity: 1; }
+}
+
+/* ==========================================
+   MATRIX RAIN EFFECT
+   ========================================== */
+.matrix-rain {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+  opacity: 0.03;
+}
+
+.matrix-column {
+  position: absolute;
+  top: -100%;
+  font-family: monospace;
+  font-size: 14px;
+  color: var(--circuit-green);
+  writing-mode: vertical-rl;
+  white-space: nowrap;
+  animation: matrix-fall linear infinite;
+}
+
+.matrix-column:nth-child(1) { left: 5%; animation-duration: 15s; animation-delay: 0s; }
+.matrix-column:nth-child(2) { left: 15%; animation-duration: 12s; animation-delay: 2s; }
+.matrix-column:nth-child(3) { left: 25%; animation-duration: 18s; animation-delay: 1s; }
+.matrix-column:nth-child(4) { left: 35%; animation-duration: 14s; animation-delay: 3s; }
+.matrix-column:nth-child(5) { left: 45%; animation-duration: 16s; animation-delay: 0.5s; }
+.matrix-column:nth-child(6) { left: 55%; animation-duration: 13s; animation-delay: 2.5s; }
+.matrix-column:nth-child(7) { left: 65%; animation-duration: 17s; animation-delay: 1.5s; }
+.matrix-column:nth-child(8) { left: 75%; animation-duration: 11s; animation-delay: 3.5s; }
+.matrix-column:nth-child(9) { left: 85%; animation-duration: 19s; animation-delay: 0.8s; }
+.matrix-column:nth-child(10) { left: 95%; animation-duration: 14s; animation-delay: 2.8s; }
+
+@keyframes matrix-fall {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(300%); }
+}
+
+/* ==========================================
+   LIGHTNING EFFECT
+   ========================================== */
+.lightning-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.lightning {
+  position: absolute;
+  width: 3px;
+  height: 0;
+  background: linear-gradient(to bottom, transparent, var(--electric-blue), var(--honey-gold), transparent);
+  opacity: 0;
+  filter: blur(1px);
+  animation: lightning-strike 8s infinite;
+}
+
+.lightning:nth-child(1) { left: 20%; animation-delay: 0s; }
+.lightning:nth-child(2) { left: 50%; animation-delay: 3s; }
+.lightning:nth-child(3) { left: 80%; animation-delay: 6s; }
+
+@keyframes lightning-strike {
+  0%, 95%, 100% { height: 0; opacity: 0; top: 0; }
+  96% { height: 50vh; opacity: 0.8; top: 0; }
+  97% { height: 50vh; opacity: 0; top: 0; }
+  98% { height: 70vh; opacity: 1; top: 0; }
+  99% { height: 70vh; opacity: 0; top: 0; }
+}
+
+/* ==========================================
+   FLOATING TECH ICONS
+   ========================================== */
+.tech-icons {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.tech-icon {
+  position: absolute;
+  font-size: 24px;
+  opacity: 0.05;
+  animation: tech-float 20s ease-in-out infinite;
+}
+
+.tech-icon:nth-child(1) { top: 10%; left: 8%; animation-delay: 0s; }
+.tech-icon:nth-child(2) { top: 30%; left: 92%; animation-delay: 4s; }
+.tech-icon:nth-child(3) { top: 50%; left: 3%; animation-delay: 8s; }
+.tech-icon:nth-child(4) { top: 70%; left: 88%; animation-delay: 2s; }
+.tech-icon:nth-child(5) { top: 90%; left: 15%; animation-delay: 6s; }
+.tech-icon:nth-child(6) { top: 20%; left: 75%; animation-delay: 10s; }
+.tech-icon:nth-child(7) { top: 60%; left: 12%; animation-delay: 3s; }
+.tech-icon:nth-child(8) { top: 85%; left: 78%; animation-delay: 7s; }
+
+@keyframes tech-float {
+  0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+  25% { transform: translateY(-40px) rotate(15deg) scale(1.1); }
+  50% { transform: translateY(20px) rotate(-10deg) scale(0.9); }
+  75% { transform: translateY(-20px) rotate(5deg) scale(1.05); }
+}
+
+/* ==========================================
+   SCANNING LINE EFFECT
+   ========================================== */
+.scan-line {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--honey-gold), var(--electric-blue), transparent);
+  opacity: 0.3;
+  animation: scan-down 8s linear infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes scan-down {
+  0% { top: -10px; opacity: 0; }
+  5% { opacity: 0.3; }
+  95% { opacity: 0.3; }
+  100% { top: 100vh; opacity: 0; }
+}
+
+/* ==========================================
+   ROTATING CIRCUIT RINGS
+   ========================================== */
+.circuit-rings {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.circuit-ring {
+  position: absolute;
+  border: 1px dashed var(--honey-gold);
+  border-radius: 50%;
+  opacity: 0.05;
+  top: 50%;
+  left: 50%;
+}
+
+.circuit-ring:nth-child(1) {
+  width: 300px;
+  height: 300px;
+  margin: -150px 0 0 -150px;
+  animation: ring-rotate 30s linear infinite;
+}
+
+.circuit-ring:nth-child(2) {
+  width: 500px;
+  height: 500px;
+  margin: -250px 0 0 -250px;
+  border-color: var(--electric-blue);
+  animation: ring-rotate 45s linear infinite reverse;
+}
+
+.circuit-ring:nth-child(3) {
+  width: 700px;
+  height: 700px;
+  margin: -350px 0 0 -350px;
+  animation: ring-rotate 60s linear infinite;
+}
+
+@keyframes ring-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ==========================================
+   SERVICE CARD HOVER ENHANCEMENTS
+   ========================================== */
+.service-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.service-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(
+    transparent,
+    rgba(245, 166, 35, 0.1),
+    transparent 30%
+  );
+  animation: card-rotate 4s linear infinite;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.service-card:hover::before {
+  opacity: 1;
+}
+
+@keyframes card-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ==========================================
+   BINARY STREAM
+   ========================================== */
+.binary-stream {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+  opacity: 0.03;
+}
+
+.binary-digit {
+  position: absolute;
+  font-family: monospace;
+  font-size: 12px;
+  color: var(--honey-gold);
+  animation: binary-fall linear infinite;
+}
+
+@keyframes binary-fall {
+  0% { transform: translateY(-20px); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(100vh); opacity: 0; }
+}
