@@ -81,7 +81,18 @@ async function sendTelegramNotification(order, serviceDetails) {
 const activeSessions = new Map();
 
 let db;
-const DB_PATH = path.join(__dirname, 'ohm-hive.db');
+// Use persistent volume path if available (for Railway), otherwise use local path
+const DATA_DIR = process.env.DATA_DIR || __dirname;
+const DB_PATH = path.join(DATA_DIR, 'ohm-hive.db');
+const UPLOADS_DIR = path.join(DATA_DIR, 'uploads');
+
+// Ensure data directory exists
+if (!fs.existsSync(DATA_DIR)) {
+  fs.mkdirSync(DATA_DIR, { recursive: true });
+}
+if (!fs.existsSync(UPLOADS_DIR)) {
+  fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+}
 
 // Initialize database
 async function initDatabase() {
@@ -147,11 +158,10 @@ app.use('/translations', express.static('translations'));
 // File upload configuration
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const uploadDir = path.join(__dirname, 'uploads');
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
+    if (!fs.existsSync(UPLOADS_DIR)) {
+      fs.mkdirSync(UPLOADS_DIR, { recursive: true });
     }
-    cb(null, uploadDir);
+    cb(null, UPLOADS_DIR);
   },
   filename: (req, file, cb) => {
     const uniqueName = `${Date.now()}-${uuidv4()}${path.extname(file.originalname)}`;
@@ -712,7 +722,7 @@ app.get('/api/orders/:orderNumber/pdf', async (req, res) => {
 
 // Serve uploaded files (for admin)
 app.get('/uploads/:filename', (req, res) => {
-  const filePath = path.join(__dirname, 'uploads', req.params.filename);
+  const filePath = path.join(UPLOADS_DIR, req.params.filename);
   if (fs.existsSync(filePath)) {
     res.sendFile(filePath);
   } else {
