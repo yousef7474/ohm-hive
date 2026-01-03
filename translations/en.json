@@ -82,7 +82,7 @@
   },
   "terms": {
     "title": "Terms and Conditions",
-    "agreement": "I have read, understood, and agree to the Terms and Conditions",
+    "agreement": "I have reviewed, understood, and agreed to the Terms and Conditions.",
     "signature": "Signature",
     "signHere": "Sign here",
     "clearSignature": "Clear Signature"
@@ -156,12 +156,6 @@
       "content": [
         "Failure to comply with these terms and conditions grants Ohm Hive the right to terminate the agreement immediately.",
         "In such cases, no refund shall be issued to the customer."
-      ]
-    },
-    "section10": {
-      "title": "10. Agreement",
-      "content": [
-        "By submitting an order, the customer acknowledges that they have read, understood, and agreed to these Terms and Conditions."
       ]
     }
   },
