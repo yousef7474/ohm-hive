@@ -36,21 +36,13 @@
 
     /* Language Switcher */
     .lang-switcher {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 1001;
+      position: relative;
       display: flex;
       gap: 5px;
-      background: var(--dark-charcoal-light);
+      background: var(--dark-charcoal);
       padding: 5px;
       border-radius: 8px;
       border: 1px solid rgba(245, 166, 35, 0.3);
-    }
-
-    body[dir="rtl"] .lang-switcher {
-      right: auto;
-      left: 20px;
     }
 
     .lang-btn {
@@ -385,18 +377,16 @@
   </style>
 </head>
 <body>
-  <!-- Language Switcher -->
-  <div class="lang-switcher">
-    <button class="lang-btn active" onclick="setLanguage('en')" id="langEN">EN</button>
-    <button class="lang-btn" onclick="setLanguage('ar')" id="langAR">عربي</button>
-  </div>
-
   <!-- Login Page -->
   <div id="loginPage" class="login-container">
     <div class="login-box">
       <div class="login-logo">
         <h1>OHM HIVE</h1>
         <p data-i18n="adminPanelLogin">Admin Panel Login</p>
+        <div class="lang-switcher" style="justify-content: center; margin-top: 15px;">
+          <button class="lang-btn active" onclick="setLanguage('en')" id="langEN">EN</button>
+          <button class="lang-btn" onclick="setLanguage('ar')" id="langAR">عربي</button>
+        </div>
       </div>
       <div id="loginError" class="login-error" data-i18n="invalidCredentials">Invalid username or password</div>
       <form id="loginForm" class="login-form">
@@ -422,6 +412,10 @@
         <span data-i18n="adminPanel">Admin Panel</span>
       </div>
       <div class="admin-actions">
+        <div class="lang-switcher" id="dashboardLangSwitcher">
+          <button class="lang-btn active" onclick="setLanguage('en')" id="langEN2">EN</button>
+          <button class="lang-btn" onclick="setLanguage('ar')" id="langAR2">عربي</button>
+        </div>
         <span class="admin-user"><span data-i18n="welcome">Welcome</span>, <strong id="adminUsername"></strong></span>
         <a href="/" class="btn btn-secondary" data-i18n="viewWebsite">View Website</a>
         <button class="btn btn-primary" onclick="refreshOrders()" data-i18n="refresh">Refresh</button>
@@ -640,9 +634,13 @@
       document.documentElement.lang = lang;
       document.body.dir = lang === 'ar' ? 'rtl' : 'ltr';
 
-      // Update language buttons
+      // Update language buttons (both login and dashboard)
       document.getElementById('langEN').classList.toggle('active', lang === 'en');
       document.getElementById('langAR').classList.toggle('active', lang === 'ar');
+      const langEN2 = document.getElementById('langEN2');
+      const langAR2 = document.getElementById('langAR2');
+      if (langEN2) langEN2.classList.toggle('active', lang === 'en');
+      if (langAR2) langAR2.classList.toggle('active', lang === 'ar');
 
       // Update all text content
       document.querySelectorAll('[data-i18n]').forEach(el => {
