@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OHM HIVE - Admin Panel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --honey-gold: #F5A623;
+      --honey-gold-light: #FFD280;
+      --honey-gold-dark: #D4890E;
+      --electric-blue: #2D9CDB;
+      --dark-charcoal: #1A1A2E;
+      --dark-charcoal-light: #2D2D44;
+      --warm-white: #FFF8F0;
+      --circuit-green: #27AE60;
+      --error-red: #E74C3C;
+      --warning-orange: #F39C12;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--dark-charcoal);
+      color: var(--warm-white);
+      min-height: 100vh;
+    }
+
+    body[dir="rtl"] {
+      font-family: 'Cairo', 'Inter', sans-serif;
+    }
+
+    /* Language Switcher */
+    .lang-switcher {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1001;
+      display: flex;
+      gap: 5px;
+      background: var(--dark-charcoal-light);
+      padding: 5px;
+      border-radius: 8px;
+      border: 1px solid rgba(245, 166, 35, 0.3);
+    }
+
+    body[dir="rtl"] .lang-switcher {
+      right: auto;
+      left: 20px;
+    }
+
+    .lang-btn {
+      padding: 8px 15px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      background: transparent;
+      color: rgba(255, 248, 240, 0.6);
+    }
+
+    .lang-btn.active {
+      background: var(--honey-gold);
+      color: var(--dark-charcoal);
+    }
+
+    .lang-btn:hover:not(.active) {
+      background: rgba(245, 166, 35, 0.2);
+      color: var(--warm-white);
+    }
+
+    /* Login Page */
+    .login-container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .login-box {
+      background: var(--dark-charcoal-light);
+      border-radius: 16px;
+      padding: 40px;
+      width: 100%;
+      max-width: 400px;
+      border: 1px solid rgba(245, 166, 35, 0.3);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .login-logo {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .login-logo h1 {
+      color: var(--honey-gold);
+      font-size: 2rem;
+      margin-bottom: 5px;
+    }
+
+    .login-logo p {
+      color: rgba(255, 248, 240, 0.6);
+      font-size: 0.9rem;
+    }
+
+    .login-form .form-group {
+      margin-bottom: 20px;
+    }
+
+    .login-form label {
+      display: block;
+      margin-bottom: 8px;
+      color: rgba(255, 248, 240, 0.8);
+      font-size: 0.9rem;
+    }
+
+    .login-form input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid rgba(245, 166, 35, 0.3);
+      border-radius: 8px;
+      background: var(--dark-charcoal);
+      color: var(--warm-white);
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .login-form input:focus {
+      outline: none;
+      border-color: var(--honey-gold);
+      box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.2);
+    }
+
+    .login-error {
+      background: rgba(231, 76, 60, 0.2);
+      border: 1px solid var(--error-red);
+      color: var(--error-red);
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    .login-error.show { display: block; }
+
+    /* Header */
+    .admin-header {
+      background: var(--dark-charcoal-light);
+      padding: 20px 30px;
+      border-bottom: 1px solid rgba(245, 166, 35, 0.2);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .admin-logo { display: flex; align-items: center; gap: 15px; }
+    .admin-logo h1 { color: var(--honey-gold); font-size: 1.5rem; }
+    .admin-logo span { color: rgba(255, 248, 240, 0.6); font-size: 0.9rem; }
+    .admin-actions { display: flex; gap: 15px; align-items: center; }
+    .admin-user { color: rgba(255, 248, 240, 0.7); font-size: 0.9rem; }
+
+    .btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary { background: var(--honey-gold); color: var(--dark-charcoal); }
+    .btn-primary:hover { background: var(--honey-gold-dark); }
+    .btn-secondary { background: transparent; border: 1px solid var(--honey-gold); color: var(--honey-gold); }
+    .btn-secondary:hover { background: rgba(245, 166, 35, 0.1); }
+    .btn-danger { background: var(--error-red); color: white; }
+    .btn-danger:hover { background: #c0392b; }
+
+    /* Main Content */
+    .admin-content { padding: 30px; max-width: 1400px; margin: 0 auto; }
+
+    /* Stats */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background: var(--dark-charcoal-light);
+      border-radius: 12px;
+      padding: 25px;
+      border: 1px solid rgba(245, 166, 35, 0.2);
+    }
+
+    .stat-card h3 { color: rgba(255, 248, 240, 0.6); font-size: 0.9rem; margin-bottom: 10px; }
+    .stat-card .value { font-size: 2rem; font-weight: 700; color: var(--honey-gold); }
+
+    /* Filters */
+    .filters { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
+    .filter-group { display: flex; align-items: center; gap: 10px; }
+    .filter-group label { color: rgba(255, 248, 240, 0.7); font-size: 0.9rem; }
+    .filter-group select, .filter-group input {
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid rgba(245, 166, 35, 0.3);
+      background: var(--dark-charcoal);
+      color: var(--warm-white);
+    }
+
+    /* Orders Table */
+    .orders-section {
+      background: var(--dark-charcoal-light);
+      border-radius: 12px;
+      border: 1px solid rgba(245, 166, 35, 0.2);
+      overflow: hidden;
+    }
+
+    .orders-header {
+      padding: 20px;
+      border-bottom: 1px solid rgba(245, 166, 35, 0.2);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .orders-header h2 { color: var(--honey-gold); }
+    .orders-table { width: 100%; border-collapse: collapse; }
+    .orders-table th, .orders-table td {
+      padding: 15px 20px;
+      text-align: left;
+      border-bottom: 1px solid rgba(245, 166, 35, 0.1);
+    }
+
+    body[dir="rtl"] .orders-table th,
+    body[dir="rtl"] .orders-table td {
+      text-align: right;
+    }
+
+    .orders-table th {
+      background: var(--dark-charcoal);
+      color: var(--honey-gold);
+      font-weight: 600;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .orders-table tr:hover { background: rgba(245, 166, 35, 0.05); }
+    .orders-table td { color: rgba(255, 248, 240, 0.9); font-size: 0.95rem; }
+
+    /* Status Badge */
+    .status-badge { padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; text-transform: capitalize; }
+    .status-pending { background: rgba(243, 156, 18, 0.2); color: var(--warning-orange); }
+    .status-confirmed { background: rgba(45, 156, 219, 0.2); color: var(--electric-blue); }
+    .status-in-progress { background: rgba(245, 166, 35, 0.2); color: var(--honey-gold); }
+    .status-completed { background: rgba(39, 174, 96, 0.2); color: var(--circuit-green); }
+    .status-cancelled { background: rgba(231, 76, 60, 0.2); color: var(--error-red); }
+
+    /* Action Buttons */
+    .action-btns { display: flex; gap: 8px; }
+    .action-btn { padding: 6px 10px; border-radius: 4px; border: none; cursor: pointer; font-size: 0.85rem; transition: all 0.2s ease; }
+    .action-btn.view { background: rgba(45, 156, 219, 0.2); color: var(--electric-blue); }
+    .action-btn.print { background: rgba(39, 174, 96, 0.2); color: var(--circuit-green); }
+    .action-btn.delete { background: rgba(231, 76, 60, 0.2); color: var(--error-red); }
+    .action-btn:hover { transform: scale(1.05); }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal.active { display: flex; }
+
+    .modal-content {
+      background: var(--dark-charcoal-light);
+      border-radius: 12px;
+      max-width: 800px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      border: 1px solid rgba(245, 166, 35, 0.3);
+    }
+
+    .modal-header {
+      padding: 20px;
+      border-bottom: 1px solid rgba(245, 166, 35, 0.2);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h2 { color: var(--honey-gold); }
+    .close-btn { background: none; border: none; color: rgba(255, 248, 240, 0.6); font-size: 1.5rem; cursor: pointer; }
+    .close-btn:hover { color: var(--error-red); }
+    .modal-body { padding: 20px; }
+
+    /* Order Details */
+    .order-details { display: grid; gap: 20px; }
+    .detail-section { background: var(--dark-charcoal); border-radius: 8px; padding: 20px; }
+    .detail-section h3 { color: var(--honey-gold); font-size: 1rem; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid rgba(245, 166, 35, 0.2); }
+    .detail-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(245, 166, 35, 0.1); }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-row .label { color: rgba(255, 248, 240, 0.6); }
+    .detail-row .value { color: var(--warm-white); font-weight: 500; }
+
+    .status-update, .cost-update { display: flex; gap: 10px; align-items: center; margin-top: 15px; }
+    .status-update select, .cost-update input {
+      padding: 8px 15px;
+      border-radius: 6px;
+      border: 1px solid rgba(245, 166, 35, 0.3);
+      background: var(--dark-charcoal);
+      color: var(--warm-white);
+    }
+    .status-update select { flex: 1; }
+    .cost-update input { width: 150px; }
+
+    .signature-display { background: var(--warm-white); border-radius: 8px; padding: 10px; margin-top: 10px; }
+    .signature-display img { max-width: 100%; height: auto; }
+
+    .files-list { display: flex; flex-direction: column; gap: 10px; }
+    .file-item { display: flex; align-items: center; gap: 10px; padding: 10px; background: rgba(245, 166, 35, 0.1); border-radius: 6px; }
+    .file-item a { color: var(--electric-blue); text-decoration: none; }
+    .file-item a:hover { text-decoration: underline; }
+
+    .empty-state { text-align: center; padding: 60px 20px; color: rgba(255, 248, 240, 0.5); }
+    .empty-state svg { width: 80px; height: 80px; margin-bottom: 20px; opacity: 0.5; }
+
+    .loading { text-align: center; padding: 40px; color: var(--honey-gold); }
+    .loading::after {
+      content: '';
+      display: inline-block;
+      width: 20px; height: 20px;
+      border: 2px solid transparent;
+      border-top-color: var(--honey-gold);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-left: 10px;
+      vertical-align: middle;
+    }
+
+    body[dir="rtl"] .loading::after {
+      margin-left: 0;
+      margin-right: 10px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .hidden { display: none !important; }
+
+    .pdf-buttons { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+    @media (max-width: 768px) {
+      .admin-header { flex-direction: column; gap: 15px; }
+      .orders-table { display: block; overflow-x: auto; }
+      .filters { flex-direction: column; }
+      .lang-switcher { top: 10px; right: 10px; }
+      body[dir="rtl"] .lang-switcher { left: 10px; right: auto; }
+    }
+
+    @media print {
+      .login-container, .admin-header, .filters, .action-btns, .modal, .status-update, .cost-update, .lang-switcher { display: none !important; }
+      body { background: white; color: black; }
+      .orders-section, .stat-card, .detail-section { border-color: #ddd; background: white; }
+      .orders-table th { background: #f5f5f5; color: black; }
+      .orders-table td { color: black; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Language Switcher -->
+  <div class="lang-switcher">
+    <button class="lang-btn active" onclick="setLanguage('en')" id="langEN">EN</button>
+    <button class="lang-btn" onclick="setLanguage('ar')" id="langAR">عربي</button>
+  </div>
+
+  <!-- Login Page -->
+  <div id="loginPage" class="login-container">
+    <div class="login-box">
+      <div class="login-logo">
+        <h1>OHM HIVE</h1>
+        <p data-i18n="adminPanelLogin">Admin Panel Login</p>
+      </div>
+      <div id="loginError" class="login-error" data-i18n="invalidCredentials">Invalid username or password</div>
+      <form id="loginForm" class="login-form">
+        <div class="form-group">
+          <label for="username" data-i18n="username">Username</label>
+          <input type="text" id="username" name="username" required autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label for="password" data-i18n="password">Password</label>
+          <input type="password" id="password" name="password" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;" data-i18n="login">Login</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Admin Dashboard (hidden by default) -->
+  <div id="adminDashboard" class="hidden">
+    <!-- Header -->
+    <header class="admin-header">
+      <div class="admin-logo">
+        <h1>OHM HIVE</h1>
+        <span data-i18n="adminPanel">Admin Panel</span>
+      </div>
+      <div class="admin-actions">
+        <span class="admin-user"><span data-i18n="welcome">Welcome</span>, <strong id="adminUsername"></strong></span>
+        <a href="/" class="btn btn-secondary" data-i18n="viewWebsite">View Website</a>
+        <button class="btn btn-primary" onclick="refreshOrders()" data-i18n="refresh">Refresh</button>
+        <button class="btn btn-danger" onclick="logout()" data-i18n="logout">Logout</button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="admin-content">
+      <div class="stats-grid">
+        <div class="stat-card"><h3 data-i18n="totalOrders">Total Orders</h3><div class="value" id="totalOrders">0</div></div>
+        <div class="stat-card"><h3 data-i18n="pending">Pending</h3><div class="value" id="pendingOrders">0</div></div>
+        <div class="stat-card"><h3 data-i18n="inProgress">In Progress</h3><div class="value" id="inProgressOrders">0</div></div>
+        <div class="stat-card"><h3 data-i18n="completed">Completed</h3><div class="value" id="completedOrders">0</div></div>
+      </div>
+
+      <div class="filters">
+        <div class="filter-group">
+          <label data-i18n="status">Status:</label>
+          <select id="statusFilter" onchange="filterOrders()">
+            <option value="" data-i18n="all">All</option>
+            <option value="pending" data-i18n="pending">Pending</option>
+            <option value="confirmed" data-i18n="confirmed">Confirmed</option>
+            <option value="in-progress" data-i18n="inProgress">In Progress</option>
+            <option value="completed" data-i18n="completed">Completed</option>
+            <option value="cancelled" data-i18n="cancelled">Cancelled</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label data-i18n="service">Service:</label>
+          <select id="serviceFilter" onchange="filterOrders()">
+            <option value="" data-i18n="allServices">All Services</option>
+            <option value="course-project" data-i18n="courseProject">Course Project</option>
+            <option value="senior-project" data-i18n="seniorProject">Senior Project</option>
+            <option value="consulting" data-i18n="consulting">Consulting</option>
+            <option value="supervision" data-i18n="supervision">Senior Design Supervision</option>
+            <option value="3d-modeling" data-i18n="3dModeling">3D Modeling</option>
+            <option value="3d-printing" data-i18n="3dPrinting">3D Printing</option>
+            <option value="homework" data-i18n="homework">Homework</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label data-i18n="search">Search:</label>
+          <input type="text" id="searchInput" data-i18n-placeholder="searchPlaceholder" placeholder="Order # or name..." oninput="filterOrders()">
+        </div>
+      </div>
+
+      <div class="orders-section">
+        <div class="orders-header"><h2 data-i18n="orders">Orders</h2></div>
+        <div id="ordersContainer"><div class="loading" data-i18n="loadingOrders">Loading orders...</div></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Order Detail Modal -->
+  <div id="orderModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 data-i18n="orderDetails">Order Details</h2>
+        <button class="close-btn" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="orderDetails"></div>
+    </div>
+  </div>
+
+  <script>
+    // Translations
+    const translations = {
+      en: {
+        adminPanelLogin: 'Admin Panel Login',
+        invalidCredentials: 'Invalid username or password',
+        username: 'Username',
+        password: 'Password',
+        login: 'Login',
+        adminPanel: 'Admin Panel',
+        welcome: 'Welcome',
+        viewWebsite: 'View Website',
+        refresh: 'Refresh',
+        logout: 'Logout',
+        totalOrders: 'Total Orders',
+        pending: 'Pending',
+        inProgress: 'In Progress',
+        completed: 'Completed',
+        confirmed: 'Confirmed',
+        cancelled: 'Cancelled',
+        status: 'Status:',
+        service: 'Service:',
+        search: 'Search:',
+        searchPlaceholder: 'Order # or name...',
+        all: 'All',
+        allServices: 'All Services',
+        courseProject: 'Course Project',
+        seniorProject: 'Senior Project',
+        consulting: 'Consulting',
+        supervision: 'Senior Design Supervision',
+        '3dModeling': '3D Modeling',
+        '3dPrinting': '3D Printing',
+        homework: 'Homework',
+        orders: 'Orders',
+        loadingOrders: 'Loading orders...',
+        orderDetails: 'Order Details',
+        orderNumber: 'Order #',
+        customer: 'Customer',
+        date: 'Date',
+        total: 'Total',
+        actions: 'Actions',
+        view: 'View',
+        print: 'Print',
+        delete: 'Delete',
+        orderInfo: 'Order Information',
+        customerInfo: 'Customer Information',
+        serviceDetails: 'Service Details',
+        costBreakdown: 'Cost Breakdown',
+        uploadedFiles: 'Uploaded Files',
+        customerSignature: 'Customer Signature',
+        downloadPdfEn: 'Download PDF (English)',
+        downloadPdfAr: 'Download PDF (Arabic)',
+        updateStatus: 'Update Status',
+        updateCost: 'Update Cost',
+        setTotalCost: 'Set total cost',
+        totalCost: 'Total Cost',
+        toBeDetemined: 'To be determined',
+        name: 'Name',
+        phone: 'Phone',
+        email: 'Email',
+        serviceType: 'Service Type',
+        noOrders: 'No orders found',
+        errorLoading: 'Error loading orders',
+        statusUpdated: 'Status updated successfully',
+        costUpdated: 'Cost updated successfully',
+        errorUpdatingStatus: 'Error updating status',
+        errorUpdatingCost: 'Error updating cost',
+        confirmDelete: 'Are you sure you want to delete this order? This action cannot be undone.',
+        errorLoadingDetails: 'Error loading order details',
+        tbd: 'TBD'
+      },
+      ar: {
+        adminPanelLogin: 'تسجيل دخول لوحة الإدارة',
+        invalidCredentials: 'اسم المستخدم أو كلمة المرور غير صحيحة',
+        username: 'اسم المستخدم',
+        password: 'كلمة المرور',
+        login: 'تسجيل الدخول',
+        adminPanel: 'لوحة الإدارة',
+        welcome: 'مرحباً',
+        viewWebsite: 'عرض الموقع',
+        refresh: 'تحديث',
+        logout: 'تسجيل الخروج',
+        totalOrders: 'إجمالي الطلبات',
+        pending: 'قيد الانتظار',
+        inProgress: 'قيد التنفيذ',
+        completed: 'مكتمل',
+        confirmed: 'مؤكد',
+        cancelled: 'ملغي',
+        status: 'الحالة:',
+        service: 'الخدمة:',
+        search: 'بحث:',
+        searchPlaceholder: 'رقم الطلب أو الاسم...',
+        all: 'الكل',
+        allServices: 'جميع الخدمات',
+        courseProject: 'مشروع مادة',
+        seniorProject: 'مشروع التخرج',
+        consulting: 'استشارات',
+        supervision: 'إشراف على مشروع التخرج',
+        '3dModeling': 'نمذجة ثلاثية الأبعاد',
+        '3dPrinting': 'طباعة ثلاثية الأبعاد',
+        homework: 'واجبات',
+        orders: 'الطلبات',
+        loadingOrders: 'جاري تحميل الطلبات...',
+        orderDetails: 'تفاصيل الطلب',
+        orderNumber: 'رقم الطلب',
+        customer: 'العميل',
+        date: 'التاريخ',
+        total: 'الإجمالي',
+        actions: 'الإجراءات',
+        view: 'عرض',
+        print: 'طباعة',
+        delete: 'حذف',
+        orderInfo: 'معلومات الطلب',
+        customerInfo: 'معلومات العميل',
+        serviceDetails: 'تفاصيل الخدمة',
+        costBreakdown: 'تفاصيل التكلفة',
+        uploadedFiles: 'الملفات المرفوعة',
+        customerSignature: 'توقيع العميل',
+        downloadPdfEn: 'تحميل PDF (إنجليزي)',
+        downloadPdfAr: 'تحميل PDF (عربي)',
+        updateStatus: 'تحديث الحالة',
+        updateCost: 'تحديث التكلفة',
+        setTotalCost: 'تحديد التكلفة الإجمالية',
+        totalCost: 'التكلفة الإجمالية',
+        toBeDetemined: 'سيتم تحديدها',
+        name: 'الاسم',
+        phone: 'الهاتف',
+        email: 'البريد الإلكتروني',
+        serviceType: 'نوع الخدمة',
+        noOrders: 'لا توجد طلبات',
+        errorLoading: 'خطأ في تحميل الطلبات',
+        statusUpdated: 'تم تحديث الحالة بنجاح',
+        costUpdated: 'تم تحديث التكلفة بنجاح',
+        errorUpdatingStatus: 'خطأ في تحديث الحالة',
+        errorUpdatingCost: 'خطأ في تحديث التكلفة',
+        confirmDelete: 'هل أنت متأكد من حذف هذا الطلب؟ لا يمكن التراجع عن هذا الإجراء.',
+        errorLoadingDetails: 'خطأ في تحميل تفاصيل الطلب',
+        tbd: 'سيحدد لاحقاً'
+      }
+    };
+
+    let currentLang = localStorage.getItem('ohmhive_admin_lang') || 'en';
+    let allOrders = [];
+    let authToken = localStorage.getItem('ohmhive_admin_token');
+
+    // Set language
+    function setLanguage(lang) {
+      currentLang = lang;
+      localStorage.setItem('ohmhive_admin_lang', lang);
+
+      document.documentElement.lang = lang;
+      document.body.dir = lang === 'ar' ? 'rtl' : 'ltr';
+
+      // Update language buttons
+      document.getElementById('langEN').classList.toggle('active', lang === 'en');
+      document.getElementById('langAR').classList.toggle('active', lang === 'ar');
+
+      // Update all text content
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (translations[lang][key]) {
+          el.textContent = translations[lang][key];
+        }
+      });
+
+      // Update placeholders
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (translations[lang][key]) {
+          el.placeholder = translations[lang][key];
+        }
+      });
+
+      // Re-render orders table if loaded
+      if (allOrders.length > 0) {
+        renderOrders(allOrders);
+      }
+    }
+
+    // Translation helper
+    function t(key) {
+      return translations[currentLang][key] || key;
+    }
+
+    // Check auth on load
+    document.addEventListener('DOMContentLoaded', async () => {
+      setLanguage(currentLang);
+
+      if (authToken) {
+        const isValid = await verifyToken();
+        if (isValid) {
+          showDashboard();
+          loadOrders();
+        } else {
+          showLogin();
+        }
+      } else {
+        showLogin();
+      }
+    });
+
+    // Verify token
+    async function verifyToken() {
+      try {
+        const response = await fetch('/api/admin/verify', {
+          headers: { 'X-Auth-Token': authToken }
+        });
+        const data = await response.json();
+        if (data.valid) {
+          document.getElementById('adminUsername').textContent = data.username;
+          return true;
+        }
+        return false;
+      } catch (error) {
+        return false;
+      }
+    }
+
+    // Show login page
+    function showLogin() {
+      document.getElementById('loginPage').classList.remove('hidden');
+      document.getElementById('adminDashboard').classList.add('hidden');
+      localStorage.removeItem('ohmhive_admin_token');
+      authToken = null;
+    }
+
+    // Show dashboard
+    function showDashboard() {
+      document.getElementById('loginPage').classList.add('hidden');
+      document.getElementById('adminDashboard').classList.remove('hidden');
+    }
+
+    // Login form handler
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      try {
+        const response = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          authToken = data.token;
+          localStorage.setItem('ohmhive_admin_token', authToken);
+          document.getElementById('adminUsername').textContent = username;
+          document.getElementById('loginError').classList.remove('show');
+          showDashboard();
+          loadOrders();
+        } else {
+          document.getElementById('loginError').classList.add('show');
+        }
+      } catch (error) {
+        document.getElementById('loginError').classList.add('show');
+      }
+    });
+
+    // Logout
+    async function logout() {
+      try {
+        await fetch('/api/admin/logout', {
+          method: 'POST',
+          headers: { 'X-Auth-Token': authToken }
+        });
+      } catch (error) {}
+      showLogin();
+    }
+
+    // API request helper
+    async function apiRequest(url, options = {}) {
+      const headers = { ...options.headers, 'X-Auth-Token': authToken };
+      const response = await fetch(url, { ...options, headers });
+      if (response.status === 401) {
+        showLogin();
+        throw new Error('Unauthorized');
+      }
+      return response;
+    }
+
+    // Load orders
+    async function loadOrders() {
+      try {
+        const response = await apiRequest('/api/orders');
+        allOrders = await response.json();
+        updateStats();
+        renderOrders(allOrders);
+      } catch (error) {
+        if (error.message !== 'Unauthorized') {
+          document.getElementById('ordersContainer').innerHTML = `<div class="empty-state">${t('errorLoading')}</div>`;
+        }
+      }
+    }
+
+    function refreshOrders() {
+      document.getElementById('ordersContainer').innerHTML = `<div class="loading">${t('loadingOrders')}</div>`;
+      loadOrders();
+    }
+
+    function updateStats() {
+      document.getElementById('totalOrders').textContent = allOrders.length;
+      document.getElementById('pendingOrders').textContent = allOrders.filter(o => o.status === 'pending').length;
+      document.getElementById('inProgressOrders').textContent = allOrders.filter(o => o.status === 'in-progress').length;
+      document.getElementById('completedOrders').textContent = allOrders.filter(o => o.status === 'completed').length;
+    }
+
+    function filterOrders() {
+      const statusFilter = document.getElementById('statusFilter').value;
+      const serviceFilter = document.getElementById('serviceFilter').value;
+      const searchInput = document.getElementById('searchInput').value.toLowerCase();
+
+      let filtered = allOrders;
+      if (statusFilter) filtered = filtered.filter(o => o.status === statusFilter);
+      if (serviceFilter) filtered = filtered.filter(o => o.service_type === serviceFilter);
+      if (searchInput) {
+        filtered = filtered.filter(o =>
+          o.order_number.toLowerCase().includes(searchInput) ||
+          o.first_name.toLowerCase().includes(searchInput) ||
+          o.last_name.toLowerCase().includes(searchInput) ||
+          o.email.toLowerCase().includes(searchInput)
+        );
+      }
+      renderOrders(filtered);
+    }
+
+    function renderOrders(orders) {
+      const container = document.getElementById('ordersContainer');
+      if (orders.length === 0) {
+        container.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg><p>${t('noOrders')}</p></div>`;
+        return;
+      }
+
+      container.innerHTML = `
+        <table class="orders-table">
+          <thead>
+            <tr>
+              <th>${t('orderNumber')}</th>
+              <th>${t('customer')}</th>
+              <th>${t('service')}</th>
+              <th>${t('date')}</th>
+              <th>${t('total')}</th>
+              <th>${t('status')}</th>
+              <th>${t('actions')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${orders.map(order => `
+              <tr>
+                <td><strong>${order.order_number}</strong></td>
+                <td>${order.first_name} ${order.last_name}<br><small style="color: rgba(255,248,240,0.5)">${order.phone}</small></td>
+                <td>${getServiceLabel(order.service_type)}</td>
+                <td>${formatDate(order.created_at)}</td>
+                <td>${order.total_cost ? order.total_cost + ' SAR' : `<span style="color: var(--electric-blue)">${t('tbd')}</span>`}</td>
+                <td><span class="status-badge status-${order.status}">${getStatusLabel(order.status)}</span></td>
+                <td>
+                  <div class="action-btns">
+                    <button class="action-btn view" onclick="viewOrder('${order.order_number}')">${t('view')}</button>
+                    <button class="action-btn print" onclick="printOrder('${order.order_number}')">${t('print')}</button>
+                    <button class="action-btn delete" onclick="deleteOrder(${order.id})">${t('delete')}</button>
+                  </div>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>`;
+    }
+
+    function getServiceLabel(type) {
+      const labelsEN = {
+        'course-project': 'Course Project',
+        'senior-project': 'Senior Project',
+        'consulting': 'Consulting',
+        'supervision': 'Senior Design Supervision',
+        '3d-modeling': '3D Modeling',
+        '3d-printing': '3D Printing',
+        'homework': 'Homework'
+      };
+      const labelsAR = {
+        'course-project': 'مشروع مادة',
+        'senior-project': 'مشروع التخرج',
+        'consulting': 'استشارات',
+        'supervision': 'إشراف على مشروع التخرج',
+        '3d-modeling': 'نمذجة ثلاثية الأبعاد',
+        '3d-printing': 'طباعة ثلاثية الأبعاد',
+        'homework': 'واجبات'
+      };
+      return currentLang === 'ar' ? (labelsAR[type] || type) : (labelsEN[type] || type);
+    }
+
+    function getStatusLabel(status) {
+      const statusLabels = {
+        'pending': currentLang === 'ar' ? 'قيد الانتظار' : 'pending',
+        'confirmed': currentLang === 'ar' ? 'مؤكد' : 'confirmed',
+        'in-progress': currentLang === 'ar' ? 'قيد التنفيذ' : 'in-progress',
+        'completed': currentLang === 'ar' ? 'مكتمل' : 'completed',
+        'cancelled': currentLang === 'ar' ? 'ملغي' : 'cancelled'
+      };
+      return statusLabels[status] || status;
+    }
+
+    function formatDate(dateStr) {
+      const locale = currentLang === 'ar' ? 'ar-SA' : 'en-GB';
+      return new Date(dateStr).toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    async function viewOrder(orderNumber) {
+      try {
+        const response = await fetch(`/api/orders/${orderNumber}`);
+        const order = await response.json();
+        const details = order.service_details || {};
+        const costs = order.calculated_costs || {};
+
+        document.getElementById('orderDetails').innerHTML = `
+          <div class="order-details">
+            <div class="detail-section">
+              <h3>${t('orderInfo')}</h3>
+              <div class="detail-row"><span class="label">${t('orderNumber')}</span><span class="value">${order.order_number}</span></div>
+              <div class="detail-row"><span class="label">${t('date')}</span><span class="value">${formatDate(order.created_at)}</span></div>
+              <div class="detail-row"><span class="label">${t('status')}</span><span class="value"><span class="status-badge status-${order.status}">${getStatusLabel(order.status)}</span></span></div>
+              <div class="status-update">
+                <select id="statusSelect">
+                  <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>${t('pending')}</option>
+                  <option value="confirmed" ${order.status === 'confirmed' ? 'selected' : ''}>${t('confirmed')}</option>
+                  <option value="in-progress" ${order.status === 'in-progress' ? 'selected' : ''}>${t('inProgress')}</option>
+                  <option value="completed" ${order.status === 'completed' ? 'selected' : ''}>${t('completed')}</option>
+                  <option value="cancelled" ${order.status === 'cancelled' ? 'selected' : ''}>${t('cancelled')}</option>
+                </select>
+                <button class="btn btn-primary" onclick="updateStatus(${order.id})">${t('updateStatus')}</button>
+              </div>
+            </div>
+
+            <div class="detail-section">
+              <h3>${t('customerInfo')}</h3>
+              <div class="detail-row"><span class="label">${t('name')}</span><span class="value">${order.first_name} ${order.last_name}</span></div>
+              <div class="detail-row"><span class="label">${t('phone')}</span><span class="value"><a href="https://wa.me/966${order.phone.replace(/^0/, '')}" target="_blank" style="color: var(--circuit-green)">${order.phone}</a></span></div>
+              <div class="detail-row"><span class="label">${t('email')}</span><span class="value"><a href="mailto:${order.email}" style="color: var(--electric-blue)">${order.email}</a></span></div>
+            </div>
+
+            <div class="detail-section">
+              <h3>${t('serviceDetails')}</h3>
+              <div class="detail-row"><span class="label">${t('serviceType')}</span><span class="value">${getServiceLabel(order.service_type)}</span></div>
+              ${Object.entries(details).map(([key, value]) => {
+                if (!value || key === 'files') return '';
+                const displayValue = Array.isArray(value) ? value.join(', ') : value;
+                return `<div class="detail-row"><span class="label">${formatLabel(key)}</span><span class="value">${displayValue}</span></div>`;
+              }).join('')}
+            </div>
+
+            <div class="detail-section">
+              <h3>${t('costBreakdown')}</h3>
+              ${Object.entries(costs).map(([key, value]) => `<div class="detail-row"><span class="label">${formatLabel(key)}</span><span class="value">${value} SAR</span></div>`).join('')}
+              <div class="detail-row" style="border-top: 2px solid var(--honey-gold); margin-top: 10px; padding-top: 15px;">
+                <span class="label"><strong>${t('totalCost')}</strong></span>
+                <span class="value"><strong>${order.total_cost ? order.total_cost + ' SAR' : t('toBeDetemined')}</strong></span>
+              </div>
+              <div class="cost-update">
+                <input type="number" id="totalCostInput" placeholder="${t('setTotalCost')}" value="${order.total_cost || ''}">
+                <span>SAR</span>
+                <button class="btn btn-primary" onclick="updateCost(${order.id})">${t('updateCost')}</button>
+              </div>
+            </div>
+
+            ${order.files && order.files.length > 0 ? `
+              <div class="detail-section">
+                <h3>${t('uploadedFiles')}</h3>
+                <div class="files-list">
+                  ${order.files.map(file => `<div class="file-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><a href="/uploads/${file.filename}" target="_blank">${file.original_name}</a></div>`).join('')}
+                </div>
+              </div>
+            ` : ''}
+
+            ${order.signature ? `
+              <div class="detail-section">
+                <h3>${t('customerSignature')}</h3>
+                <div class="signature-display"><img src="${order.signature}" alt="Customer Signature"></div>
+              </div>
+            ` : ''}
+
+            <div class="detail-section" style="text-align: center;">
+              <div class="pdf-buttons">
+                <a href="/api/orders/${order.order_number}/pdf?lang=en" class="btn btn-primary" download>${t('downloadPdfEn')}</a>
+                <a href="/api/orders/${order.order_number}/pdf?lang=ar" class="btn btn-secondary" download>${t('downloadPdfAr')}</a>
+              </div>
+            </div>
+          </div>`;
+
+        document.getElementById('orderModal').classList.add('active');
+      } catch (error) {
+        alert(t('errorLoadingDetails'));
+      }
+    }
+
+    function formatLabel(key) {
+      return key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()).replace(/Id$/, 'ID');
+    }
+
+    function closeModal() { document.getElementById('orderModal').classList.remove('active'); }
+
+    document.getElementById('orderModal').addEventListener('click', (e) => {
+      if (e.target.id === 'orderModal') closeModal();
+    });
+
+    async function updateStatus(orderId) {
+      const status = document.getElementById('statusSelect').value;
+      try {
+        await apiRequest(`/api/orders/${orderId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status })
+        });
+        alert(t('statusUpdated'));
+        closeModal();
+        loadOrders();
+      } catch (error) {
+        if (error.message !== 'Unauthorized') alert(t('errorUpdatingStatus'));
+      }
+    }
+
+    async function updateCost(orderId) {
+      const totalCost = document.getElementById('totalCostInput').value;
+      try {
+        await apiRequest(`/api/orders/${orderId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ totalCost: parseFloat(totalCost) })
+        });
+        alert(t('costUpdated'));
+        closeModal();
+        loadOrders();
+      } catch (error) {
+        if (error.message !== 'Unauthorized') alert(t('errorUpdatingCost'));
+      }
+    }
+
+    function printOrder(orderNumber) {
+      window.open(`/api/orders/${orderNumber}/pdf?lang=${currentLang}`, '_blank');
+    }
+
+    async function deleteOrder(orderId) {
+      if (!confirm(t('confirmDelete'))) return;
+      try {
+        await apiRequest(`/api/orders/${orderId}`, { method: 'DELETE' });
+        loadOrders();
+      } catch (error) {
+        if (error.message !== 'Unauthorized') alert('Error deleting order');
+      }
+    }
+
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+  </script>
+</body>
+</html>
