@@ -60,10 +60,6 @@ html[dir="rtl"] .form-grid {
   direction: rtl;
 }
 
-html[dir="rtl"] .lang-switcher {
-  left: 20px;
-  right: auto;
-}
 
 /* Container */
 .container {
@@ -72,28 +68,36 @@ html[dir="rtl"] .lang-switcher {
   padding: 0 20px;
 }
 
-/* Language Switcher */
-.lang-switcher {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 1001;
+/* Language Switcher - In Navbar */
+.nav-lang-switcher {
   display: flex;
-  gap: 5px;
-  background: var(--dark-charcoal-light);
-  padding: 5px;
-  border-radius: var(--radius-md);
+  align-items: center;
+  margin-left: 10px;
+}
+
+html[dir="rtl"] .nav-lang-switcher {
+  margin-left: 0;
+  margin-right: 10px;
+}
+
+.lang-switcher {
+  display: flex;
+  gap: 3px;
+  background: rgba(26, 26, 46, 0.8);
+  padding: 3px;
+  border-radius: var(--radius-sm);
   border: 1px solid rgba(245, 166, 35, 0.3);
 }
 
 .lang-btn {
-  padding: 8px 12px;
+  padding: 6px 10px;
   border: none;
   background: transparent;
   color: var(--text-light);
   cursor: pointer;
   border-radius: var(--radius-sm);
   font-weight: 500;
+  font-size: 0.85rem;
   transition: var(--transition);
 }
 
@@ -1116,11 +1120,6 @@ html[dir="rtl"] .lang-switcher {
     align-items: center;
   }
 
-  .lang-switcher {
-    top: auto;
-    bottom: 20px;
-    right: 20px;
-  }
 }
 
 /* Scrollbar Styling */
