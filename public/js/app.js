@@ -1,7 +1,7 @@
 // OHM HIVE - Main Application JavaScript
 
 // Global state
-let currentLang = 'en';
+let currentLang = localStorage.getItem('ohmhive_lang') || 'en';
 let translations = {};
 let signaturePad = null;
 
@@ -116,11 +116,28 @@ function renderTermsContent() {
 // Language switcher
 function initLanguageSwitcher() {
   const langBtns = document.querySelectorAll('.lang-btn');
+
+  // Apply saved language on load
+  document.documentElement.lang = currentLang;
+  document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+
+  // Set correct button as active based on saved language
+  langBtns.forEach(btn => {
+    const btnLang = btn.getAttribute('data-lang');
+    if (btnLang === currentLang) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
+
+  // Add click handlers
   langBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       const lang = btn.getAttribute('data-lang');
       if (lang !== currentLang) {
         currentLang = lang;
+        localStorage.setItem('ohmhive_lang', lang);
         langBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
 
