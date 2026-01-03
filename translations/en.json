@@ -1,0 +1,216 @@
+{
+  "brand": {
+    "name": "OHM HIVE",
+    "tagline": "Where Ideas Buzz to Life"
+  },
+  "nav": {
+    "home": "Home",
+    "services": "Services",
+    "order": "Place Order",
+    "contact": "Contact"
+  },
+  "hero": {
+    "title": "Engineering Your Success",
+    "subtitle": "Professional engineering services for students - from course projects to senior projects, 3D printing, and more.",
+    "cta": "Place Your Order"
+  },
+  "services": {
+    "title": "Our Services",
+    "courseProject": {
+      "title": "Course Project",
+      "description": "Complete course projects in electronics, circuits, IoT, and microcontrollers."
+    },
+    "seniorProject": {
+      "title": "Senior Project",
+      "description": "Full senior project development with professional guidance and support."
+    },
+    "consulting": {
+      "title": "Consulting",
+      "description": "Expert technical consulting at 80 SAR/hour."
+    },
+    "supervision": {
+      "title": "Senior Design Supervision",
+      "description": "Senior design project supervision from 2,500 to 8,000 SAR."
+    },
+    "modeling": {
+      "title": "3D Model/Design",
+      "description": "Professional 3D modeling and design services."
+    },
+    "printing": {
+      "title": "3D Printing",
+      "description": "High-quality 3D printing at 3 SAR/gram."
+    },
+    "homework": {
+      "title": "Homework for Courses",
+      "description": "Assistance with course homework using MATLAB, Simulink, Proteus, and more."
+    }
+  },
+  "form": {
+    "title": "Place Your Order",
+    "personalInfo": "Personal Information",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "phone": "Phone Number",
+    "email": "Email Address",
+    "selectService": "Select Service",
+    "chooseService": "Choose a service...",
+    "projectIdea": "Project Idea / Description",
+    "projectIdeaPlaceholder": "Describe your project idea in detail...",
+    "deadline": "Deadline",
+    "reportRequired": "Do you need a report with the project?",
+    "pptRequired": "Do you need a presentation (PPT) with the project?",
+    "yes": "Yes",
+    "no": "No",
+    "supervisionPeriod": "Supervision Period",
+    "months": "months",
+    "month": "month",
+    "modelDescription": "Describe the 3D model you want",
+    "modelDescriptionPlaceholder": "Describe the model with all details (dimensions, features, purpose)...",
+    "uploadFile": "Upload File",
+    "upload3DFile": "Upload 3D File (STL or 3MF only)",
+    "selectColor": "Select Color",
+    "selectMaterial": "Select Material",
+    "homeworkDetails": "Homework Details",
+    "homeworkDetailsPlaceholder": "Describe the homework requirements...",
+    "uploadHomework": "Upload Homework File (Image, Word, or PDF)",
+    "selectSoftware": "Select Required Software",
+    "consultingHours": "Estimated Hours Needed",
+    "extraCost": "Extra Cost",
+    "baseCost": "Base Cost",
+    "toBeDetemined": "To be determined later by engineer",
+    "total": "Total"
+  },
+  "terms": {
+    "title": "Terms and Conditions",
+    "agreement": "I have read, understood, and agree to the Terms and Conditions",
+    "signature": "Signature",
+    "signHere": "Sign here",
+    "clearSignature": "Clear Signature"
+  },
+  "termsContent": {
+    "title": "OHM HIVE — Terms and Conditions",
+    "section1": {
+      "title": "1. Payment Terms",
+      "content": [
+        "Payment is divided into two installments: 50% before commencement of work, and 50% upon completion.",
+        "Work shall commence only upon receipt of the first payment.",
+        "Final deliverables shall be released only upon receipt of the second payment.",
+        "All prices are final and non-negotiable."
+      ]
+    },
+    "section2": {
+      "title": "2. Components and Materials",
+      "content": [
+        "The cost of electronic components and materials required for the project is not included in the service fee.",
+        "The customer is responsible for either providing the components directly or paying for their procurement."
+      ]
+    },
+    "section3": {
+      "title": "3. Delivery and Late Submission",
+      "content": [
+        "The Engineer commits to delivering work by the agreed deadline.",
+        "The Engineer is responsible for submitting all files, documents, and deliverables as specified in the project description and requirements provided by the customer.",
+        "In the event of late delivery, a deduction of 200 SAR per day shall be applied to the total cost and refunded to the customer."
+      ]
+    },
+    "section4": {
+      "title": "4. Explanation Sessions",
+      "content": [
+        "Course Projects: One complimentary explanation session is included to review the project implementation. Additional sessions are charged at 100 SAR per session.",
+        "Senior Projects: Two meetings per month are included throughout the project duration, plus one preparation session before each presentation. Additional sessions are charged at 100 SAR per session."
+      ]
+    },
+    "section5": {
+      "title": "5. Revisions and Adjustments",
+      "content": [
+        "One round of revisions for reports and presentations is included at no additional cost.",
+        "Subsequent revision requests shall be charged at 50 SAR per hour based on time required."
+      ]
+    },
+    "section6": {
+      "title": "6. Scope of Services",
+      "content": [
+        "Ohm Hive provides technical development and implementation services only.",
+        "We do not provide project ideas, nor do we evaluate or rate customer ideas.",
+        "Enhancement suggestions may be offered during development at the Engineer's discretion.",
+        "Ohm Hive is not responsible for the acceptance or rejection of the customer's idea by any academic institution or third party."
+      ]
+    },
+    "section7": {
+      "title": "7. Consulting Services",
+      "content": [
+        "Consulting sessions are billed per hour at 80 SAR/hour.",
+        "Any time exceeding the hour, even by one minute, shall be billed as a full additional hour."
+      ]
+    },
+    "section8": {
+      "title": "8. Communication and Conduct",
+      "content": [
+        "All communication shall be conducted via WhatsApp, email, or online meetings only.",
+        "Face-to-face meetings may be arranged upon mutual agreement and at the Engineer's availability.",
+        "Professional and respectful communication is required from both parties at all times."
+      ]
+    },
+    "section9": {
+      "title": "9. Termination",
+      "content": [
+        "Failure to comply with these terms and conditions grants Ohm Hive the right to terminate the agreement immediately.",
+        "In such cases, no refund shall be issued to the customer."
+      ]
+    },
+    "section10": {
+      "title": "10. Agreement",
+      "content": [
+        "By submitting an order, the customer acknowledges that they have read, understood, and agreed to these Terms and Conditions."
+      ]
+    }
+  },
+  "receipt": {
+    "title": "Order Submitted Successfully!",
+    "orderNumber": "Order Number",
+    "summary": "Order Summary",
+    "downloadPDF": "Download PDF Receipt",
+    "newOrder": "Place New Order",
+    "thankYou": "Thank you for choosing Ohm Hive! We will contact you shortly via WhatsApp or email to discuss your project.",
+    "paymentReminder": "Payment Reminder",
+    "paymentNote": "Please note: Work will commence after receiving the first payment (50%). Final deliverables will be released upon receiving the second payment (50%)."
+  },
+  "contact": {
+    "title": "Contact Us",
+    "whatsapp": "WhatsApp",
+    "email": "Email",
+    "reachOut": "Have questions? Reach out to us!"
+  },
+  "footer": {
+    "rights": "All rights reserved",
+    "madeWith": "Crafted with"
+  },
+  "colors": {
+    "red": "Red",
+    "black": "Black",
+    "white": "White",
+    "blue": "Blue",
+    "green": "Green",
+    "orange": "Orange",
+    "yellow": "Yellow",
+    "brown": "Brown",
+    "engineRed": "Engine Red",
+    "lightBlue": "Light Blue",
+    "darkBlue": "Dark Blue",
+    "darkGreen": "Dark Green",
+    "limeGreen": "Lime Green",
+    "gray": "Gray",
+    "pink": "Pink",
+    "purple": "Purple",
+    "copper": "Copper",
+    "golden": "Golden"
+  },
+  "validation": {
+    "required": "This field is required",
+    "invalidEmail": "Please enter a valid email address",
+    "invalidPhone": "Please enter a valid phone number",
+    "selectService": "Please select a service",
+    "agreeTerms": "You must agree to the Terms and Conditions",
+    "signatureRequired": "Please provide your signature"
+  }
+}
