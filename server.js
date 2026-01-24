@@ -7,8 +7,6 @@ const PDFDocument = require('pdfkit');
 const { v4: uuidv4 } = require('uuid');
 const crypto = require('crypto');
 const QRCode = require('qrcode');
-const ArabicReshaper = require('arabic-reshaper');
-const bidiFactory = require('bidi-js');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
