@@ -436,21 +436,13 @@ app.delete('/api/orders/:id', requireAuth, (req, res) => {
   }
 });
 
-// Helper function to fix Arabic text for PDF using proper RTL shaping
-const bidi = bidiFactory();
+// Helper function for Arabic text in PDF
+// Testing different approaches for RTL text rendering in PDFKit
 function fixArabicText(text) {
   if (!text) return '';
-  try {
-    // Step 1: Reshape Arabic characters (connect letters properly)
-    const reshaped = ArabicReshaper.reshape(text);
-    // Step 2: Apply bidi algorithm to get correct visual order
-    const { levels } = bidi.getEmbeddingLevels(reshaped, 'rtl');
-    const reordered = bidi.getReorderedString(reshaped, levels);
-    return reordered;
-  } catch (e) {
-    // Fallback: simple word reversal if libraries fail
-    return text.split(' ').reverse().join(' ');
-  }
+  // For now, don't transform - just return as-is and use right alignment
+  // PDFKit with proper fonts should handle Arabic correctly
+  return text;
 }
 
 // API: Generate PDF receipt (Enhanced with QR code, logo, and bilingual support)
@@ -585,16 +577,28 @@ app.get('/api/orders/:orderNumber/pdf', async (req, res) => {
     // Register fonts - use Amiri for all text (supports both Arabic and Latin)
     const amiriRegular = path.join(__dirname, 'fonts', 'Amiri-Regular.ttf');
     const amiriBold = path.join(__dirname, 'fonts', 'Amiri-Bold.ttf');
-    let fontsAvailable = false;
-    if (fs.existsSync(amiriRegular) && fs.existsSync(amiriBold)) {
-      doc.registerFont('Amiri', amiriRegular);
-      doc.registerFont('Amiri-Bold', amiriBold);
-      fontsAvailable = true;
+
+    // Always try to register fonts, log errors for debugging
+    try {
+      if (fs.existsSync(amiriRegular)) {
+        doc.registerFont('Amiri', amiriRegular);
+        console.log('Registered Amiri font');
+      } else {
+        console.log('Amiri-Regular.ttf not found at:', amiriRegular);
+      }
+      if (fs.existsSync(amiriBold)) {
+        doc.registerFont('Amiri-Bold', amiriBold);
+        console.log('Registered Amiri-Bold font');
+      } else {
+        console.log('Amiri-Bold.ttf not found at:', amiriBold);
+      }
+    } catch (fontError) {
+      console.error('Font registration error:', fontError);
     }
 
-    // Font helpers - use Amiri for everything to avoid Helvetica issues
-    const fontRegular = fontsAvailable ? 'Amiri' : 'Helvetica';
-    const fontBold = fontsAvailable ? 'Amiri-Bold' : 'Helvetica-Bold';
+    // Always use Amiri fonts (they support both Arabic and Latin characters)
+    const fontRegular = 'Amiri';
+    const fontBold = 'Amiri-Bold';
     const textAlign = isArabic ? 'right' : 'left';
 
     res.setHeader('Content-Type', 'application/pdf');
@@ -654,12 +658,14 @@ app.get('/api/orders/:orderNumber/pdf', async (req, res) => {
     doc.rect(50, 245, 512, 25).fill('#F5F5F5');
     doc.fillColor(darkCharcoal).fontSize(13).font(fontBold).text(ar(tr.customerInfo), 60, 251, { align: textAlign, width: 492 });
 
-    // Customer name - fix Arabic word order
+    // Customer name
     const customerName = order.first_name + ' ' + order.last_name;
     doc.fillColor('#333333').fontSize(11).font(fontBold);
     if (isArabic) {
-      doc.text(ar(customerName) + ' :' + ar(tr.name.replace(':', '')), 60, 278, { align: 'right', width: 492 });
-      doc.font(fontRegular).text(order.phone + ' :' + ar(tr.phone.replace(':', '')), 60, 295, { align: 'right', width: 492 });
+      // For Arabic: Label on right, value on left (RTL order)
+      // Format: "الاسم: باسل زيدان" - rendered right-aligned
+      doc.text(tr.name + ' ' + customerName, 60, 278, { align: 'right', width: 492 });
+      doc.font(fontRegular).text(tr.phone + ' ' + order.phone, 60, 295, { align: 'right', width: 492 });
     } else {
       doc.text(tr.name + ' ' + customerName, 60, 278);
       doc.font(fontRegular).text(tr.phone + ' ' + order.phone + '   |   ' + tr.email + ' ' + order.email, 60, 295);
@@ -673,7 +679,7 @@ app.get('/api/orders/:orderNumber/pdf', async (req, res) => {
     doc.fillColor('#333333').fontSize(12).font(fontBold);
     const serviceLabel = tr.services[order.service_type] || order.service_type;
     if (isArabic) {
-      doc.fillColor(honeyGold).text(ar(serviceLabel) + ' :' + ar(tr.serviceType.replace(':', '')), 60, 365, { align: 'right', width: 492 });
+      doc.fillColor(honeyGold).text(tr.serviceType + ' ' + serviceLabel, 60, 365, { align: 'right', width: 492 });
     } else {
       doc.text(tr.serviceType + ' ' + serviceLabel, 60, 365);
     }
