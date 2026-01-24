@@ -893,9 +893,10 @@ function showConfirmation(orderNumber, serviceType, details, costs, totalCost) {
 
   receiptSummary.innerHTML = html;
 
-  // Set download link
-  downloadBtn.href = `/api/orders/${orderNumber}/pdf`;
-  downloadBtn.download = `OhmHive-${orderNumber}.pdf`;
+  // Set invoice link (opens in new tab for printing)
+  downloadBtn.href = `/api/orders/${orderNumber}/invoice?lang=${currentLang}`;
+  downloadBtn.target = '_blank';
+  downloadBtn.removeAttribute('download');
 
   modal.classList.add('active');
 }

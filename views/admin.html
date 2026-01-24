@@ -1154,8 +1154,8 @@
 
             <div class="detail-section" style="text-align: center;">
               <div class="pdf-buttons">
-                <a href="/api/orders/${order.order_number}/pdf?lang=en" class="btn btn-primary" download>${t('downloadPdfEn')}</a>
-                <a href="/api/orders/${order.order_number}/pdf?lang=ar" class="btn btn-secondary" download>${t('downloadPdfAr')}</a>
+                <a href="/api/orders/${order.order_number}/invoice?lang=en" class="btn btn-primary" target="_blank">${t('downloadPdfEn')}</a>
+                <a href="/api/orders/${order.order_number}/invoice?lang=ar" class="btn btn-secondary" target="_blank">${t('downloadPdfAr')}</a>
               </div>
             </div>
           </div>`;
@@ -1234,7 +1234,7 @@
     }
 
     function printOrder(orderNumber) {
-      window.open(`/api/orders/${orderNumber}/pdf?lang=${currentLang}`, '_blank');
+      window.open(`/api/orders/${orderNumber}/invoice?lang=${currentLang}`, '_blank');
     }
 
     async function deleteOrder(orderId) {
