@@ -11,6 +11,15 @@ const QRCode = require('qrcode');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Cache invoice template at startup
+let invoiceTemplate = '';
+try {
+  invoiceTemplate = fs.readFileSync(path.join(__dirname, 'views', 'invoice.html'), 'utf8');
+  console.log('Invoice template loaded successfully');
+} catch (e) {
+  console.error('Failed to load invoice template:', e.message);
+}
+
 // Admin credentials
 const ADMIN_USERNAME = 'Yusuf7474';
 const ADMIN_PASSWORD = 'Khh@8956';
@@ -154,6 +163,11 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(express.static('public'));
 app.use('/translations', express.static('translations'));
+
+// Health check endpoint for Railway
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
 
 // File upload configuration
 const storage = multer.diskStorage({
@@ -633,8 +647,8 @@ app.get('/api/orders/:orderNumber/invoice', async (req, res) => {
     const orderDate = order.created_at ? new Date(order.created_at).toLocaleDateString(dateLocale, { year: 'numeric', month: 'short', day: 'numeric' }) : 'N/A';
     const generatedDate = new Date().toLocaleDateString(dateLocale);
 
-    // Read and process template
-    let html = fs.readFileSync(path.join(__dirname, 'views', 'invoice.html'), 'utf8');
+    // Use cached template
+    let html = invoiceTemplate;
 
     // Replace placeholders
     const replacements = {
