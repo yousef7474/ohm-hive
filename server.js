@@ -434,12 +434,23 @@ app.delete('/api/orders/:id', requireAuth, (req, res) => {
   }
 });
 
+// Helper function to fix Arabic text for PDF (reverse word order for RTL)
+function fixArabicText(text) {
+  if (!text) return '';
+  // Split by spaces, reverse the array, and join back
+  // This fixes the word order issue in PDFKit for Arabic
+  return text.split(' ').reverse().join(' ');
+}
+
 // API: Generate PDF receipt (Enhanced with QR code, logo, and bilingual support)
 app.get('/api/orders/:orderNumber/pdf', async (req, res) => {
   try {
     const order = getOne('SELECT * FROM orders WHERE order_number = ?', [req.params.orderNumber]);
     const lang = req.query.lang || 'en';
     const isArabic = lang === 'ar';
+
+    // Helper to apply Arabic fix when needed
+    const ar = (text) => isArabic ? fixArabicText(text) : text;
 
     if (!order) {
       return res.status(404).json({ error: 'Order not found' });
@@ -600,8 +611,8 @@ app.get('/api/orders/:orderNumber/pdf', async (req, res) => {
     const headerX = isArabic ? 50 : 120;
     const headerWidth = isArabic ? 440 : 350;
     doc.fillColor('#FFFFFF').fontSize(28).font(fontBold).text('OHM HIVE', headerX, 30, { align: textAlign, width: headerWidth });
-    doc.fillColor(honeyGold).fontSize(12).font(fontRegular).text(tr.tagline, headerX, 65, { align: textAlign, width: headerWidth });
-    doc.fillColor('#AAAAAA').fontSize(9).text(tr.contact, headerX, 85, { align: textAlign, width: headerWidth });
+    doc.fillColor(honeyGold).fontSize(12).font(fontRegular).text(ar(tr.tagline), headerX, 65, { align: textAlign, width: headerWidth });
+    doc.fillColor('#AAAAAA').fontSize(9).text(ar(tr.contact), headerX, 85, { align: textAlign, width: headerWidth });
 
     // QR Code in header
     try {
@@ -610,46 +621,48 @@ app.get('/api/orders/:orderNumber/pdf', async (req, res) => {
 
     // Receipt title bar
     doc.rect(0, 120, 612, 35).fill(honeyGold);
-    doc.fillColor(darkCharcoal).fontSize(18).font(fontBold).text(tr.receipt, 50, 126, { align: 'center', width: 512 });
+    doc.fillColor(darkCharcoal).fontSize(18).font(fontBold).text(ar(tr.receipt), 50, 126, { align: 'center', width: 512 });
 
     // Order number box
     const leftBoxX = isArabic ? 312 : 50;
     const rightBoxX = isArabic ? 50 : 312;
     doc.rect(leftBoxX, 175, 250, 50).lineWidth(2).stroke(honeyGold);
-    doc.fillColor(darkCharcoal).fontSize(11).font(fontBold).text(tr.orderNumber, leftBoxX + 10, 182, { align: textAlign, width: 230 });
+    doc.fillColor(darkCharcoal).fontSize(11).font(fontBold).text(ar(tr.orderNumber), leftBoxX + 10, 182, { align: textAlign, width: 230 });
     doc.fillColor(honeyGold).fontSize(20).font(fontBold).text(order.order_number, leftBoxX + 10, 198, { align: textAlign, width: 230 });
 
     // Date and status box
     doc.rect(rightBoxX, 175, 250, 50).lineWidth(2).stroke(electricBlue);
-    doc.fillColor(darkCharcoal).fontSize(11).font(fontBold).text(tr.dateStatus, rightBoxX + 10, 182, { align: textAlign, width: 230 });
+    doc.fillColor(darkCharcoal).fontSize(11).font(fontBold).text(ar(tr.dateStatus), rightBoxX + 10, 182, { align: textAlign, width: 230 });
     const dateLocale = isArabic ? 'ar-SA' : 'en-US';
     const orderDate = order.created_at ? new Date(order.created_at).toLocaleDateString(dateLocale, { year: 'numeric', month: 'short', day: 'numeric' }) : 'N/A';
-    const statusText = tr.statuses[order.status] || (order.status || 'PENDING').toUpperCase();
-    doc.fillColor(electricBlue).fontSize(14).font(fontBold).text(orderDate + ' | ' + statusText, rightBoxX + 10, 200, { align: textAlign, width: 230 });
+    const statusText = ar(tr.statuses[order.status] || (order.status || 'PENDING').toUpperCase());
+    doc.fillColor(electricBlue).fontSize(14).font(fontBold).text(ar(orderDate + ' | ' + statusText), rightBoxX + 10, 200, { align: textAlign, width: 230 });
 
     // Customer Information Section
     doc.rect(50, 245, 512, 70).lineWidth(1).stroke('#DDDDDD');
     doc.rect(50, 245, 512, 25).fill('#F5F5F5');
-    doc.fillColor(darkCharcoal).fontSize(13).font(fontBold).text(tr.customerInfo, 60, 251, { align: textAlign, width: 492 });
+    doc.fillColor(darkCharcoal).fontSize(13).font(fontBold).text(ar(tr.customerInfo), 60, 251, { align: textAlign, width: 492 });
 
+    // Customer name - fix Arabic word order
+    const customerName = order.first_name + ' ' + order.last_name;
     doc.fillColor('#333333').fontSize(11).font(fontBold);
     if (isArabic) {
-      doc.text(order.first_name + ' ' + order.last_name + ' :' + tr.name.replace(':', ''), 60, 278, { align: 'right', width: 492 });
-      doc.font(fontRegular).text(order.phone + ' :' + tr.phone.replace(':', ''), 60, 295, { align: 'right', width: 492 });
+      doc.text(ar(customerName) + ' :' + ar(tr.name.replace(':', '')), 60, 278, { align: 'right', width: 492 });
+      doc.font(fontRegular).text(order.phone + ' :' + ar(tr.phone.replace(':', '')), 60, 295, { align: 'right', width: 492 });
     } else {
-      doc.text(tr.name + ' ' + order.first_name + ' ' + order.last_name, 60, 278);
+      doc.text(tr.name + ' ' + customerName, 60, 278);
       doc.font(fontRegular).text(tr.phone + ' ' + order.phone + '   |   ' + tr.email + ' ' + order.email, 60, 295);
     }
 
     // Service Details Section
     doc.rect(50, 330, 512, 80).lineWidth(1).stroke('#DDDDDD');
     doc.rect(50, 330, 512, 25).fill(honeyGold);
-    doc.fillColor('#FFFFFF').fontSize(13).font(fontBold).text(tr.serviceDetails, 60, 336, { align: textAlign, width: 492 });
+    doc.fillColor('#FFFFFF').fontSize(13).font(fontBold).text(ar(tr.serviceDetails), 60, 336, { align: textAlign, width: 492 });
 
     doc.fillColor('#333333').fontSize(12).font(fontBold);
     const serviceLabel = tr.services[order.service_type] || order.service_type;
     if (isArabic) {
-      doc.fillColor(honeyGold).text(serviceLabel + ' :' + tr.serviceType.replace(':', ''), 60, 365, { align: 'right', width: 492 });
+      doc.fillColor(honeyGold).text(ar(serviceLabel) + ' :' + ar(tr.serviceType.replace(':', '')), 60, 365, { align: 'right', width: 492 });
     } else {
       doc.text(tr.serviceType + ' ' + serviceLabel, 60, 365);
     }
@@ -700,7 +713,7 @@ app.get('/api/orders/:orderNumber/pdf', async (req, res) => {
     const costBoxHeight = Math.max(80, 30 + costItems.length * 20 + 30);
     doc.rect(50, costSectionY, 512, costBoxHeight).lineWidth(1).stroke('#DDDDDD');
     doc.rect(50, costSectionY, 512, 25).fill(electricBlue);
-    doc.fillColor('#FFFFFF').fontSize(13).font(fontBold).text(tr.costBreakdown, 60, costSectionY + 6, { align: textAlign, width: 492 });
+    doc.fillColor('#FFFFFF').fontSize(13).font(fontBold).text(ar(tr.costBreakdown), 60, costSectionY + 6, { align: textAlign, width: 492 });
 
     yPos = costSectionY + 35;
     doc.fillColor('#333333').fontSize(11);
@@ -709,7 +722,7 @@ app.get('/api/orders/:orderNumber/pdf', async (req, res) => {
     for (const item of costItems) {
       if (isArabic) {
         doc.font(fontBold).text(item.value + ' SAR', 60, yPos);
-        doc.font(fontRegular).text(item.label, 200, yPos, { align: 'right', width: 350 });
+        doc.font(fontRegular).text(ar(item.label), 200, yPos, { align: 'right', width: 350 });
       } else {
         doc.font(fontRegular).text(item.label, 70, yPos);
         doc.font(fontBold).text(item.value + ' SAR', 420, yPos, { align: 'right', width: 130 });
@@ -731,9 +744,9 @@ app.get('/api/orders/:orderNumber/pdf', async (req, res) => {
       if (finalTotal > 0) {
         doc.fillColor(honeyGold).text(finalTotal + ' SAR', 60, totalLineY + 7);
       } else {
-        doc.fillColor(electricBlue).fontSize(12).text(tr.tbd, 60, totalLineY + 7);
+        doc.fillColor(electricBlue).fontSize(12).text(ar(tr.tbd), 60, totalLineY + 7);
       }
-      doc.fillColor(darkCharcoal).fontSize(14).text(tr.total, 400, totalLineY + 7, { align: 'right', width: 150 });
+      doc.fillColor(darkCharcoal).fontSize(14).text(ar(tr.total), 400, totalLineY + 7, { align: 'right', width: 150 });
     } else {
       doc.fillColor(darkCharcoal).text(tr.total, 70, totalLineY + 7);
       if (finalTotal > 0) {
@@ -747,7 +760,7 @@ app.get('/api/orders/:orderNumber/pdf', async (req, res) => {
     const sigStartY = costSectionY + costBoxHeight + 15;
     if (order.signature && order.signature.startsWith('data:image')) {
       doc.rect(50, sigStartY, 200, 70).lineWidth(1).stroke('#DDDDDD');
-      doc.fillColor('#666666').fontSize(11).font(fontBold).text(tr.signature, 60, sigStartY + 8, { align: textAlign, width: 180 });
+      doc.fillColor('#666666').fontSize(11).font(fontBold).text(ar(tr.signature), 60, sigStartY + 8, { align: textAlign, width: 180 });
       try {
         doc.image(order.signature, 60, sigStartY + 25, { width: 170, height: 40 });
       } catch (e) {
@@ -758,60 +771,57 @@ app.get('/api/orders/:orderNumber/pdf', async (req, res) => {
     // Footer on page 1
     doc.rect(0, 720, 612, 72).fill(darkCharcoal);
     doc.fillColor('#AAAAAA').fontSize(10).font(fontRegular);
-    doc.text(tr.footer1, 50, 735, { align: 'center', width: 512 });
-    doc.text(tr.footer2 + new Date().toLocaleDateString(dateLocale) + ' | OHM HIVE', 50, 752, { align: 'center', width: 512 });
+    doc.text(ar(tr.footer1), 50, 735, { align: 'center', width: 512 });
+    doc.text(ar(tr.footer2) + new Date().toLocaleDateString(dateLocale) + ' | OHM HIVE', 50, 752, { align: 'center', width: 512 });
 
-    // ========== PAGE 2: TERMS AND CONDITIONS ==========
+    // ========== PAGE 2+: TERMS AND CONDITIONS ==========
     doc.addPage();
 
     // Header for terms page
     doc.rect(0, 0, 612, 80).fill(darkCharcoal);
     doc.fillColor(honeyGold).fontSize(24).font(fontBold).text('OHM HIVE', 50, 25, { align: 'center', width: 512 });
-    doc.fillColor('#FFFFFF').fontSize(16).font(fontBold).text(tr.terms.title, 50, 55, { align: 'center', width: 512 });
+    doc.fillColor('#FFFFFF').fontSize(16).font(fontBold).text(ar(tr.terms.title), 50, 55, { align: 'center', width: 512 });
 
-    // Terms content
+    // Terms content - render all 9 sections
     let termsY = 100;
     const termSections = ['section1', 'section2', 'section3', 'section4', 'section5', 'section6', 'section7', 'section8', 'section9'];
 
-    doc.fillColor('#333333');
     for (const section of termSections) {
-      if (termsY > 700) {
+      const term = tr.terms[section];
+      const titleText = ar(term.title);
+      const contentText = ar(term.content);
+
+      // Calculate height needed for this section
+      doc.fontSize(10).font(fontRegular);
+      const contentHeight = doc.heightOfString(contentText, { width: 512, lineGap: 4 });
+      const sectionHeight = 25 + contentHeight + 15; // title + content + padding
+
+      // Check if we need a new page
+      if (termsY + sectionHeight > 750) {
         doc.addPage();
         termsY = 50;
       }
 
-      const term = tr.terms[section];
-
       // Section title
-      doc.fontSize(12).font(fontBold).fillColor(honeyGold);
-      if (isArabic) {
-        doc.text(term.title, 50, termsY, { align: 'right', width: 512 });
-      } else {
-        doc.text(term.title, 50, termsY);
-      }
-      termsY += 20;
+      doc.fontSize(11).font(fontBold).fillColor(honeyGold);
+      doc.text(titleText, 50, termsY, { align: isArabic ? 'right' : 'left', width: 512 });
+      termsY += 18;
 
       // Section content
       doc.fontSize(10).font(fontRegular).fillColor('#333333');
-      if (isArabic) {
-        doc.text(term.content, 50, termsY, { align: 'right', width: 512, lineGap: 3 });
-      } else {
-        doc.text(term.content, 50, termsY, { width: 512, lineGap: 3 });
-      }
-
-      // Calculate height of text and move position
-      const textHeight = doc.heightOfString(term.content, { width: 512, lineGap: 3 });
-      termsY += textHeight + 20;
+      doc.text(contentText, 50, termsY, { align: isArabic ? 'right' : 'left', width: 512, lineGap: 4 });
+      termsY += contentHeight + 15;
     }
 
-    // Final footer
-    if (termsY > 700) {
+    // Add footer at bottom of last terms page
+    const footerY = Math.max(termsY + 20, 750);
+    if (footerY > 750) {
       doc.addPage();
-      termsY = 50;
     }
-    doc.rect(0, 720, 612, 72).fill(darkCharcoal);
+    doc.rect(0, 750, 612, 42).fill(darkCharcoal);
     doc.fillColor('#AAAAAA').fontSize(9).font(fontRegular);
-    doc.text('OHM HIVE - Where Ideas Buzz to Life | WhatsApp: 0536113736', 50, 745, { align: 'center', width: 512 });
+    const footerText = isArabic ? 'OHM HIVE - حيث تنبض الأفكار بالحياة | واتساب: 0536113736' : 'OHM HIVE - Where Ideas Buzz to Life | WhatsApp: 0536113736';
+    doc.text(ar(footerText), 50, 763, { align: 'center', width: 512 });
 
     doc.end();
   } catch (error) {
