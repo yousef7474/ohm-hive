@@ -7,6 +7,8 @@ const PDFDocument = require('pdfkit');
 const { v4: uuidv4 } = require('uuid');
 const crypto = require('crypto');
 const QRCode = require('qrcode');
+const ArabicReshaper = require('arabic-reshaper');
+const bidiFactory = require('bidi-js');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -434,12 +436,21 @@ app.delete('/api/orders/:id', requireAuth, (req, res) => {
   }
 });
 
-// Helper function to fix Arabic text for PDF (reverse word order for RTL)
+// Helper function to fix Arabic text for PDF using proper RTL shaping
+const bidi = bidiFactory();
 function fixArabicText(text) {
   if (!text) return '';
-  // Split by spaces, reverse the array, and join back
-  // This fixes the word order issue in PDFKit for Arabic
-  return text.split(' ').reverse().join(' ');
+  try {
+    // Step 1: Reshape Arabic characters (connect letters properly)
+    const reshaped = ArabicReshaper.reshape(text);
+    // Step 2: Apply bidi algorithm to get correct visual order
+    const { levels } = bidi.getEmbeddingLevels(reshaped, 'rtl');
+    const reordered = bidi.getReorderedString(reshaped, levels);
+    return reordered;
+  } catch (e) {
+    // Fallback: simple word reversal if libraries fail
+    return text.split(' ').reverse().join(' ');
+  }
 }
 
 // API: Generate PDF receipt (Enhanced with QR code, logo, and bilingual support)
@@ -497,16 +508,16 @@ app.get('/api/orders/:orderNumber/pdf', async (req, res) => {
         },
         statuses: { pending: 'PENDING', confirmed: 'CONFIRMED', 'in-progress': 'IN PROGRESS', completed: 'COMPLETED', cancelled: 'CANCELLED' },
         terms: {
-          title: 'TERMS AND CONDITIONS',
-          section1: { title: '1. Payment Terms', content: 'Payment is divided into two installments: 50% before commencement of work, and 50% upon completion. Work shall commence only upon receipt of the first payment. Final deliverables shall be released only upon receipt of the second payment. All prices are final and non-negotiable.' },
-          section2: { title: '2. Components and Materials', content: 'The cost of electronic components and materials required for the project is not included in the service fee. The customer is responsible for either providing the components directly or paying for their procurement.' },
-          section3: { title: '3. Delivery and Late Submission', content: 'Our team commits to delivering work by the agreed deadline. In the event of late delivery, the customer shall be compensated 200 SAR for each day of delay.' },
-          section4: { title: '4. Explanation Sessions', content: 'Course Projects: One complimentary explanation session included. Senior Projects: Two meetings per month plus one preparation session before each presentation. Additional sessions: 100 SAR per session.' },
-          section5: { title: '5. Adjustments', content: 'The customer is entitled to request adjustments for reports and presentations free of charge once. Subsequent adjustment requests are charged at 50 SAR per hour.' },
-          section6: { title: '6. Scope of Services', content: 'Ohm Hive provides technical development and implementation services only. We do not provide project ideas, nor do we evaluate customer ideas. Ohm Hive is not responsible for the acceptance or rejection of the idea by any academic institution.' },
-          section7: { title: '7. Consulting Services', content: 'Consulting sessions are billed at 80 SAR per hour. Any time exceeding one hour shall be billed as a full additional hour.' },
-          section8: { title: '8. Communication', content: 'All communication shall be conducted via WhatsApp, email, or online meetings only. Professional and respectful communication is required from both parties.' },
-          section9: { title: '9. Termination', content: 'Failure to comply with these terms grants Ohm Hive the right to terminate the agreement immediately. The customer shall not be entitled to claim any refunds.' }
+          title: 'OHM HIVE — Terms and Conditions',
+          section1: { title: '1. Payment Terms', content: '• Payment is divided into two installments: 50% before commencement of work, and 50% upon completion.\n• Work shall commence only upon receipt of the first payment.\n• Final deliverables shall be released only upon receipt of the second payment.\n• All prices are final and non-negotiable.' },
+          section2: { title: '2. Components and Materials', content: '• The cost of electronic components and materials required for the project is not included in the service fee.\n• The customer is responsible for either providing the components directly or paying for their procurement.' },
+          section3: { title: '3. Delivery and Late Submission', content: '• Our team commits to delivering work by the agreed deadline.\n• Our team is responsible for submitting all files, documents, and deliverables as specified in the project description and requirements provided by the customer.\n• In the event of late delivery, the customer shall be compensated 200 SAR for each day of delay.' },
+          section4: { title: '4. Explanation Sessions', content: '• Course Projects: The service includes one complimentary explanation session to review the project implementation, and additional sessions are charged at 100 SAR per session.\n• Senior Projects: The service includes two meetings per month throughout the project duration, plus one preparation session before each presentation, and additional sessions are charged at 100 SAR per session.' },
+          section5: { title: '5. Adjustments', content: '• The customer is entitled to request adjustments for reports and presentations free of charge once, and subsequent adjustment requests are charged at 50 SAR per hour based on the time required to implement the adjustments.' },
+          section6: { title: '6. Scope of Services', content: '• Ohm Hive provides technical development and implementation services only.\n• We do not provide project ideas, nor do we evaluate or rate customer ideas.\n• Enhancement suggestions may be offered during development at the Engineer\'s discretion.\n• Ohm Hive is not responsible for the acceptance or rejection of the customer\'s idea by any academic institution or third party.' },
+          section7: { title: '7. Consulting Services', content: '• Consulting sessions are billed at 80 SAR per hour, and any time exceeding one hour—even by one minute—shall be billed as a full additional hour.' },
+          section8: { title: '8. Communication and Conduct', content: '• All communication shall be conducted via WhatsApp, email, or online meetings only. Face-to-face meetings may be arranged upon mutual agreement and subject to the Engineer\'s availability. Professional and respectful communication is required from both parties at all times.' },
+          section9: { title: '9. Termination', content: '• Failure to comply with these terms and conditions grants Ohm Hive the right to terminate the agreement immediately. In such cases, the customer shall not be entitled to claim any refunds.' }
         }
       },
       ar: {
@@ -545,16 +556,16 @@ app.get('/api/orders/:orderNumber/pdf', async (req, res) => {
         },
         statuses: { pending: 'قيد الانتظار', confirmed: 'مؤكد', 'in-progress': 'قيد التنفيذ', completed: 'مكتمل', cancelled: 'ملغي' },
         terms: {
-          title: 'الشروط والأحكام',
-          section1: { title: '1. شروط الدفع', content: 'يتم تقسيم الدفع إلى قسطين: 50% قبل بدء العمل و 50% عند الانتهاء. يبدأ العمل فقط عند استلام الدفعة الأولى. لا يتم تسليم المخرجات النهائية إلا بعد استلام الدفعة الثانية كاملة. التكلفة نهائية وغير قابلة للتفاوض.' },
-          section2: { title: '2. المكونات والمواد', content: 'تكلفة المكونات الإلكترونية والمواد المطلوبة للمشروع غير مشمولة في رسوم الخدمة. العميل مسؤول عن توفير المكونات مباشرة أو دفع تكلفة شرائها.' },
-          section3: { title: '3. التسليم والتأخير', content: 'يلتزم فريقنا بتسليم العمل في الموعد المتفق عليه. في حال تأخر تسليم العمل، يُعوَّض العميل بمبلغ 200 ريال عن كل يوم تأخير.' },
-          section4: { title: '4. جلسات الشرح', content: 'مشاريع المقررات: جلسة شرح مجانية واحدة. مشاريع التخرج: اجتماعَين شهريًا بالإضافة إلى جلسة تحضيرية قبل كل عرض. الجلسات الإضافية: 100 ريال لكل جلسة.' },
-          section5: { title: '5. التعديلات', content: 'يحق للعميل طلب إجراء التعديلات على التقارير والعروض التقديمية مجانًا لمرة واحدة. طلبات التعديل اللاحقة تُحتسب بمبلغ 50 ريال لكل ساعة.' },
-          section6: { title: '6. نطاق الخدمات', content: 'يقدم Ohm Hive خدمات التطوير والتنفيذ التقني فقط. نحن لا نقدم أفكار المشاريع ولا نقيّم أفكار العملاء. Ohm Hive غير مسؤول عن قبول أو رفض الفكرة من قبل أي مؤسسة أكاديمية.' },
-          section7: { title: '7. خدمات الاستشارات', content: 'تُحتسب جلسات الاستشارة بمبلغ 80 ريال لكل ساعة. أي مدة تتجاوز ساعة واحدة تُحتسب ساعة إضافية كاملة.' },
-          section8: { title: '8. التواصل', content: 'جميع الاتصالات تتم عبر واتساب أو البريد الإلكتروني أو الاجتماعات عبر الإنترنت فقط. يُشترط الالتزام بالتواصل المهني والمحترم من كلا الطرفين.' },
-          section9: { title: '9. الإنهاء', content: 'عدم الامتثال لهذه الشروط يخول Ohm Hive إنهاء الاتفاقية فورًا. لا يحق للعميل المطالبة باسترداد أي مبالغ مدفوعة.' }
+          title: 'OHM HIVE — الشروط والأحكام',
+          section1: { title: '1. شروط الدفع', content: '• يتم تقسيم الدفع إلى قسطين: 50% قبل بدء العمل و 50% عند الانتهاء.\n• يبدأ العمل فقط عند استلام الدفعة الأولى.\n• لا يتم تسليم المخرجات النهائية إلا بعد استلام الدفعة الثانية كاملة.\n• التكلفة نهائية وغير قابلة للتفاوض.' },
+          section2: { title: '2. المكونات والمواد', content: '• تكلفة المكونات الإلكترونية والمواد المطلوبة للمشروع غير مشمولة في رسوم الخدمة.\n• العميل مسؤول عن توفير المكونات مباشرة أو دفع تكلفة شرائها.' },
+          section3: { title: '3. التسليم والتأخير', content: '• يلتزم فريقنا بتسليم العمل في الموعد المتفق عليه.\n• فريقنا مسؤول عن تسليم جميع الملفات والمستندات والمخرجات كما هو محدد في وصف المشروع والمتطلبات المقدمة من العميل.\n• في حال تأخر تسليم العمل عن الموعد المتفق عليه، يُعوَّض العميل بمبلغ (200) ريال عن كل يوم تأخير.' },
+          section4: { title: '4. جلسات الشرح', content: '• مشاريع المقررات: تشمل الخدمة جلسة شرح مجانية واحدة لمراجعة تنفيذ المشروع، وتُحتسب الجلسات الإضافية بمبلغ (100) ريال لكل جلسة.\n• مشاريع التخرج: تشمل الخدمة اجتماعَين شهريًا طوال مدة المشروع، بالإضافة إلى جلسة تحضيرية قبل كل عرض، وتُحتسب الجلسات الإضافية بمبلغ (100) ريال لكل جلسة.' },
+          section5: { title: '5. التعديلات', content: '• يحق للعميل طلب إجراء التعديلات على التقارير والعروض التقديمية مجانًا لمرة واحدة، وتُحتسب طلبات التعديل اللاحقة بمبلغ (50) ريال لكل ساعة، وفقًا للوقت المستغرق في تنفيذ التعديلات.' },
+          section6: { title: '6. نطاق الخدمات', content: '• يقدم Ohm Hive خدمات التطوير والتنفيذ التقني فقط.\n• نحن لا نقدم أفكار المشاريع ولا نقيّم أو نصنّف أفكار العملاء.\n• قد يتم تقديم اقتراحات للتحسين أثناء التطوير حسب تقدير المهندس المسؤول.\n• Ohm Hive غير مسؤول عن قبول أو رفض فكرة العميل من قبل أي مؤسسة أكاديمية أو طرف ثالث.' },
+          section7: { title: '7. خدمات الاستشارات', content: '• تُحتسب جلسات الاستشارة بالساعة بمبلغ (80) ريال لكل ساعة، وأي مدة تتجاوز ساعة واحدة - ولو بدقيقة واحدة - تُحتسب ساعة إضافية كاملة.' },
+          section8: { title: '8. التواصل والسلوك', content: '• جميع الاتصالات تتم عبر واتساب أو البريد الإلكتروني أو الاجتماعات عبر الإنترنت فقط. ويمكن ترتيب اجتماعات حضورية بالاتفاق المتبادل وحسب توفر المهندس. ويُشترط الالتزام بالتواصل المهني والمحترم من كلا الطرفين في جميع الأوقات.' },
+          section9: { title: '9. الإنهاء', content: '• يُعدّ عدم الامتثال لهذه الشروط والأحكام سببًا يخول Ohm Hive إنهاء الاتفاقية فورًا. وفي هذه الحالات، لا يحق للعميل المطالبة باسترداد أي مبالغ مدفوعة.' }
         }
       }
     };
@@ -571,19 +582,19 @@ app.get('/api/orders/:orderNumber/pdf', async (req, res) => {
 
     const doc = new PDFDocument({ margin: 50, size: 'A4' });
 
-    // Register Arabic fonts
+    // Register fonts - use Amiri for all text (supports both Arabic and Latin)
     const amiriRegular = path.join(__dirname, 'fonts', 'Amiri-Regular.ttf');
     const amiriBold = path.join(__dirname, 'fonts', 'Amiri-Bold.ttf');
-    if (fs.existsSync(amiriRegular)) {
+    let fontsAvailable = false;
+    if (fs.existsSync(amiriRegular) && fs.existsSync(amiriBold)) {
       doc.registerFont('Amiri', amiriRegular);
-    }
-    if (fs.existsSync(amiriBold)) {
       doc.registerFont('Amiri-Bold', amiriBold);
+      fontsAvailable = true;
     }
 
-    // Font helpers
-    const fontRegular = isArabic ? 'Amiri' : 'Helvetica';
-    const fontBold = isArabic ? 'Amiri-Bold' : 'Helvetica-Bold';
+    // Font helpers - use Amiri for everything to avoid Helvetica issues
+    const fontRegular = fontsAvailable ? 'Amiri' : 'Helvetica';
+    const fontBold = fontsAvailable ? 'Amiri-Bold' : 'Helvetica-Bold';
     const textAlign = isArabic ? 'right' : 'left';
 
     res.setHeader('Content-Type', 'application/pdf');
