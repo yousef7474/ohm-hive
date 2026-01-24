@@ -129,6 +129,7 @@ html[dir="rtl"] .nav-lang-switcher {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: relative;
 }
 
 .nav-logo {
@@ -1083,6 +1084,7 @@ html[dir="rtl"] .nav-lang-switcher {
     padding: 20px;
     gap: 15px;
     border-bottom: 1px solid rgba(245, 166, 35, 0.2);
+    z-index: 999;
   }
 
   .nav-menu.active {
@@ -1091,6 +1093,7 @@ html[dir="rtl"] .nav-lang-switcher {
 
   .nav-toggle {
     display: flex;
+    z-index: 1000;
   }
 
   .hero h1 {

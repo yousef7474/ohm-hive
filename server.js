@@ -655,34 +655,46 @@ app.get('/api/orders/:orderNumber/pdf', async (req, res) => {
 
     yPos = 500;
     doc.fillColor('#333333').fontSize(10);
+
+    // Calculate extras total (report, ppt, etc.)
+    let extrasTotal = 0;
     for (const [key, value] of Object.entries(calculatedCosts)) {
-      if (value && typeof value === 'number' && value > 0 && yPos < 550) {
-        const formattedKey = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
-        if (isArabic) {
-          doc.font(fontBold).text('SAR ' + value, 60, yPos);
-          doc.font(fontRegular).text(formattedKey, 200, yPos, { align: 'right', width: 350 });
-        } else {
-          doc.font(fontRegular).text(formattedKey, 60, yPos);
-          doc.font(fontBold).text(value + ' SAR', 450, yPos, { align: 'right', width: 100 });
+      if (value && typeof value === 'number' && value > 0) {
+        extrasTotal += value;
+        if (yPos < 550) {
+          const formattedKey = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+          if (isArabic) {
+            doc.font(fontBold).text('SAR ' + value, 60, yPos);
+            doc.font(fontRegular).text(formattedKey, 200, yPos, { align: 'right', width: 350 });
+          } else {
+            doc.font(fontRegular).text(formattedKey, 60, yPos);
+            doc.font(fontBold).text(value + ' SAR', 450, yPos, { align: 'right', width: 100 });
+          }
+          yPos += 18;
         }
-        yPos += 18;
       }
+    }
+
+    // Calculate final total: base cost (from engineer) + extras
+    let finalTotal = null;
+    if (order.total_cost) {
+      finalTotal = order.total_cost + extrasTotal;
     }
 
     // Total line
     doc.moveTo(50, 555).lineTo(562, 555).lineWidth(2).stroke(honeyGold);
     doc.fontSize(14).font(fontBold);
     if (isArabic) {
-      if (order.total_cost) {
-        doc.fillColor(honeyGold).text('SAR ' + order.total_cost, 60, 562);
+      if (finalTotal) {
+        doc.fillColor(honeyGold).text('SAR ' + finalTotal, 60, 562);
       } else {
         doc.fillColor(electricBlue).fontSize(11).text(tr.tbd, 60, 564);
       }
       doc.fillColor(darkCharcoal).fontSize(14).text(tr.total, 400, 562, { align: 'right', width: 150 });
     } else {
       doc.fillColor(darkCharcoal).text(tr.total, 60, 562);
-      if (order.total_cost) {
-        doc.fillColor(honeyGold).text(order.total_cost + ' SAR', 400, 562, { align: 'right', width: 150 });
+      if (finalTotal) {
+        doc.fillColor(honeyGold).text(finalTotal + ' SAR', 400, 562, { align: 'right', width: 150 });
       } else {
         doc.fillColor(electricBlue).fontSize(11).text(tr.tbd, 250, 564, { align: 'right', width: 300 });
       }

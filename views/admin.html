@@ -996,7 +996,7 @@
                 <td data-label="${t('customer')}">${order.first_name} ${order.last_name}<br><small style="color: rgba(255,248,240,0.5)">${order.phone}</small></td>
                 <td data-label="${t('service')}">${getServiceLabel(order.service_type)}</td>
                 <td data-label="${t('date')}">${formatDate(order.created_at)}</td>
-                <td data-label="${t('total')}">${order.total_cost ? order.total_cost + ' SAR' : `<span style="color: var(--electric-blue)">${t('tbd')}</span>`}</td>
+                <td data-label="${t('total')}">${calculateFinalTotal(order) ? calculateFinalTotal(order) + ' SAR' : `<span style="color: var(--electric-blue)">${t('tbd')}</span>`}</td>
                 <td data-label="${t('status')}"><span class="status-badge status-${order.status}">${getStatusLabel(order.status)}</span></td>
                 <td data-label="${t('actions')}">
                   <div class="action-btns">
@@ -1009,6 +1009,21 @@
             `).join('')}
           </tbody>
         </table>`;
+    }
+
+    // Calculate final total (base cost + extras like report/ppt)
+    function calculateFinalTotal(order) {
+      let extrasTotal = 0;
+      const costs = order.calculated_costs || {};
+      for (const [key, value] of Object.entries(costs)) {
+        if (value && typeof value === 'number' && value > 0) {
+          extrasTotal += value;
+        }
+      }
+      if (order.total_cost) {
+        return order.total_cost + extrasTotal;
+      }
+      return null;
     }
 
     function getServiceLabel(type) {
@@ -1094,10 +1109,11 @@
 
             <div class="detail-section">
               <h3>${t('costBreakdown')}</h3>
+              ${order.total_cost ? `<div class="detail-row"><span class="label">${currentLang === 'ar' ? 'التكلفة الأساسية' : 'Base Cost'}</span><span class="value">${order.total_cost} SAR</span></div>` : ''}
               ${Object.entries(costs).map(([key, value]) => `<div class="detail-row"><span class="label">${formatLabel(key)}</span><span class="value">${value} SAR</span></div>`).join('')}
               <div class="detail-row" style="border-top: 2px solid var(--honey-gold); margin-top: 10px; padding-top: 15px;">
                 <span class="label"><strong>${t('totalCost')}</strong></span>
-                <span class="value"><strong>${order.total_cost ? order.total_cost + ' SAR' : t('toBeDetemined')}</strong></span>
+                <span class="value"><strong>${calculateFinalTotal(order) ? calculateFinalTotal(order) + ' SAR' : t('toBeDetemined')}</strong></span>
               </div>
               <div class="cost-update">
                 <input type="number" id="totalCostInput" placeholder="${t('setTotalCost')}" value="${order.total_cost || ''}">

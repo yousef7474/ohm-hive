@@ -1,7 +1,7 @@
 // OHM HIVE - Main Application JavaScript
 
 // Global state
-let currentLang = localStorage.getItem('ohmhive_lang') || 'en';
+let currentLang = localStorage.getItem('ohmhive_lang') || 'ar';
 let translations = {};
 let signaturePad = null;
 
