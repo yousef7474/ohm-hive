@@ -576,28 +576,41 @@ app.get('/api/orders/:orderNumber/pdf', async (req, res) => {
     const amiriRegular = path.join(__dirname, 'fonts', 'Amiri-Regular.ttf');
     const amiriBold = path.join(__dirname, 'fonts', 'Amiri-Bold.ttf');
 
-    // Always try to register fonts, log errors for debugging
-    try {
-      if (fs.existsSync(amiriRegular)) {
+    // Track which fonts were successfully registered
+    let hasAmiriRegular = false;
+    let hasAmiriBold = false;
+
+    // Register fonts with proper error handling
+    if (fs.existsSync(amiriRegular)) {
+      try {
         doc.registerFont('Amiri', amiriRegular);
-        console.log('Registered Amiri font');
-      } else {
-        console.log('Amiri-Regular.ttf not found at:', amiriRegular);
+        hasAmiriRegular = true;
+        console.log('Registered Amiri font successfully');
+      } catch (e) {
+        console.error('Failed to register Amiri font:', e.message);
       }
-      if (fs.existsSync(amiriBold)) {
-        doc.registerFont('Amiri-Bold', amiriBold);
-        console.log('Registered Amiri-Bold font');
-      } else {
-        console.log('Amiri-Bold.ttf not found at:', amiriBold);
-      }
-    } catch (fontError) {
-      console.error('Font registration error:', fontError);
+    } else {
+      console.log('Amiri-Regular.ttf not found at:', amiriRegular);
     }
 
-    // Always use Amiri fonts (they support both Arabic and Latin characters)
-    const fontRegular = 'Amiri';
-    const fontBold = 'Amiri-Bold';
+    if (fs.existsSync(amiriBold)) {
+      try {
+        doc.registerFont('Amiri-Bold', amiriBold);
+        hasAmiriBold = true;
+        console.log('Registered Amiri-Bold font successfully');
+      } catch (e) {
+        console.error('Failed to register Amiri-Bold font:', e.message);
+      }
+    } else {
+      console.log('Amiri-Bold.ttf not found at:', amiriBold);
+    }
+
+    // Use Amiri fonts if available, otherwise fall back to Helvetica (built-in)
+    const fontRegular = hasAmiriRegular ? 'Amiri' : 'Helvetica';
+    const fontBold = hasAmiriBold ? 'Amiri-Bold' : 'Helvetica-Bold';
     const textAlign = isArabic ? 'right' : 'left';
+
+    console.log('Using fonts - Regular:', fontRegular, 'Bold:', fontBold);
 
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename=OhmHive-${order.order_number}-${lang}.pdf`);
