@@ -609,12 +609,52 @@ app.get('/api/orders/:orderNumber/invoice', async (req, res) => {
     // Total display
     const totalDisplay = finalTotal > 0 ? `${finalTotal} SAR` : `<span class="tbd">${tr.tbd}</span>`;
 
-    // Build service details HTML
+    // Build service details HTML with translations
+    const fieldLabels = {
+      en: {
+        projectIdea: 'Project Idea',
+        deadline: 'Deadline',
+        reportRequired: 'Report Required',
+        pptRequired: 'Presentation Required',
+        supervisionPeriod: 'Supervision Period',
+        modelDescription: 'Model Description',
+        color: 'Color',
+        material: 'Material',
+        homeworkDetails: 'Homework Details',
+        software: 'Software',
+        consultingHours: 'Consulting Hours',
+        yes: 'Yes',
+        no: 'No'
+      },
+      ar: {
+        projectIdea: 'فكرة المشروع',
+        deadline: 'الموعد النهائي',
+        reportRequired: 'تقرير مطلوب',
+        pptRequired: 'عرض تقديمي مطلوب',
+        supervisionPeriod: 'مدة المتابعة',
+        modelDescription: 'وصف النموذج',
+        color: 'اللون',
+        material: 'المادة',
+        homeworkDetails: 'تفاصيل الواجب',
+        software: 'البرنامج',
+        consultingHours: 'ساعات الاستشارة',
+        yes: 'نعم',
+        no: 'لا'
+      }
+    };
+    const labels = fieldLabels[lang] || fieldLabels.en;
+
     let serviceDetailsHtml = '';
     for (const [key, value] of Object.entries(serviceDetails)) {
       if (value && key !== 'files') {
-        const formattedKey = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
-        const displayValue = Array.isArray(value) ? value.join(', ') : String(value).substring(0, 100);
+        // Get translated label or format the key
+        const formattedKey = labels[key] || key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+
+        // Translate yes/no values
+        let displayValue = Array.isArray(value) ? value.join(', ') : String(value).substring(0, 100);
+        if (displayValue.toLowerCase() === 'yes') displayValue = labels.yes;
+        else if (displayValue.toLowerCase() === 'no') displayValue = labels.no;
+
         serviceDetailsHtml += `<p><strong>${formattedKey}:</strong> ${displayValue}</p>`;
       }
     }
