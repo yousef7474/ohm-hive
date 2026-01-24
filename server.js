@@ -463,15 +463,17 @@ app.get('/api/orders/:orderNumber/pdf', async (req, res) => {
         serviceDetails: 'SERVICE DETAILS',
         serviceType: 'Service Type:',
         costBreakdown: 'COST BREAKDOWN',
+        baseCost: 'Base Cost',
+        report: 'Report',
+        ppt: 'Presentation',
+        consulting: 'Consulting',
+        supervision: 'Follow-up',
+        modeling: '3D Design',
+        modelingHours: 'Design Hours',
         total: 'TOTAL:',
         tbd: 'To be determined later by engineer',
-        keyTerms: 'KEY TERMS:',
-        term1: '- Payment: 50% before start, 50% upon completion',
-        term2: '- Components cost not included in service fee',
-        term3: '- Late delivery: 200 SAR deduction per day',
-        term4: '- One free adjustment included',
         signature: 'CUSTOMER SIGNATURE:',
-        footer1: 'This is an electronically generated receipt. By submitting this order, the customer has agreed to all Terms and Conditions.',
+        footer1: 'This is an electronically generated receipt.',
         footer2: 'Generated on: ',
         services: {
           'course-project': 'Course Project',
@@ -482,7 +484,19 @@ app.get('/api/orders/:orderNumber/pdf', async (req, res) => {
           '3d-printing': '3D Printing',
           'homework': 'Homework for Courses'
         },
-        statuses: { pending: 'PENDING', confirmed: 'CONFIRMED', 'in-progress': 'IN PROGRESS', completed: 'COMPLETED', cancelled: 'CANCELLED' }
+        statuses: { pending: 'PENDING', confirmed: 'CONFIRMED', 'in-progress': 'IN PROGRESS', completed: 'COMPLETED', cancelled: 'CANCELLED' },
+        terms: {
+          title: 'TERMS AND CONDITIONS',
+          section1: { title: '1. Payment Terms', content: 'Payment is divided into two installments: 50% before commencement of work, and 50% upon completion. Work shall commence only upon receipt of the first payment. Final deliverables shall be released only upon receipt of the second payment. All prices are final and non-negotiable.' },
+          section2: { title: '2. Components and Materials', content: 'The cost of electronic components and materials required for the project is not included in the service fee. The customer is responsible for either providing the components directly or paying for their procurement.' },
+          section3: { title: '3. Delivery and Late Submission', content: 'Our team commits to delivering work by the agreed deadline. In the event of late delivery, the customer shall be compensated 200 SAR for each day of delay.' },
+          section4: { title: '4. Explanation Sessions', content: 'Course Projects: One complimentary explanation session included. Senior Projects: Two meetings per month plus one preparation session before each presentation. Additional sessions: 100 SAR per session.' },
+          section5: { title: '5. Adjustments', content: 'The customer is entitled to request adjustments for reports and presentations free of charge once. Subsequent adjustment requests are charged at 50 SAR per hour.' },
+          section6: { title: '6. Scope of Services', content: 'Ohm Hive provides technical development and implementation services only. We do not provide project ideas, nor do we evaluate customer ideas. Ohm Hive is not responsible for the acceptance or rejection of the idea by any academic institution.' },
+          section7: { title: '7. Consulting Services', content: 'Consulting sessions are billed at 80 SAR per hour. Any time exceeding one hour shall be billed as a full additional hour.' },
+          section8: { title: '8. Communication', content: 'All communication shall be conducted via WhatsApp, email, or online meetings only. Professional and respectful communication is required from both parties.' },
+          section9: { title: '9. Termination', content: 'Failure to comply with these terms grants Ohm Hive the right to terminate the agreement immediately. The customer shall not be entitled to claim any refunds.' }
+        }
       },
       ar: {
         tagline: 'حيث تنبض الأفكار بالحياة',
@@ -497,15 +511,17 @@ app.get('/api/orders/:orderNumber/pdf', async (req, res) => {
         serviceDetails: 'تفاصيل الخدمة',
         serviceType: 'نوع الخدمة:',
         costBreakdown: 'تفاصيل التكلفة',
+        baseCost: 'التكلفة الأساسية',
+        report: 'التقرير',
+        ppt: 'العرض التقديمي',
+        consulting: 'الاستشارات',
+        supervision: 'المتابعة',
+        modeling: 'التصميم ثلاثي الأبعاد',
+        modelingHours: 'ساعات التصميم',
         total: 'الإجمالي:',
         tbd: 'سيتم تحديدها لاحقاً',
-        keyTerms: 'الشروط الأساسية:',
-        term1: '- الدفع: 50% قبل البدء، 50% عند الاستلام',
-        term2: '- تكلفة المكونات غير مشمولة',
-        term3: '- التأخير: تعويض 200 ريال لكل يوم',
-        term4: '- تعديل واحد مجاني مشمول',
         signature: 'توقيع العميل:',
-        footer1: 'إيصال إلكتروني. بتقديم الطلب وافق العميل على الشروط والأحكام.',
+        footer1: 'إيصال إلكتروني.',
         footer2: 'تاريخ الإصدار: ',
         services: {
           'course-project': 'مشروع مقرر',
@@ -516,7 +532,19 @@ app.get('/api/orders/:orderNumber/pdf', async (req, res) => {
           '3d-printing': 'طباعة ثلاثية الأبعاد',
           'homework': 'واجبات المقررات'
         },
-        statuses: { pending: 'قيد الانتظار', confirmed: 'مؤكد', 'in-progress': 'قيد التنفيذ', completed: 'مكتمل', cancelled: 'ملغي' }
+        statuses: { pending: 'قيد الانتظار', confirmed: 'مؤكد', 'in-progress': 'قيد التنفيذ', completed: 'مكتمل', cancelled: 'ملغي' },
+        terms: {
+          title: 'الشروط والأحكام',
+          section1: { title: '1. شروط الدفع', content: 'يتم تقسيم الدفع إلى قسطين: 50% قبل بدء العمل و 50% عند الانتهاء. يبدأ العمل فقط عند استلام الدفعة الأولى. لا يتم تسليم المخرجات النهائية إلا بعد استلام الدفعة الثانية كاملة. التكلفة نهائية وغير قابلة للتفاوض.' },
+          section2: { title: '2. المكونات والمواد', content: 'تكلفة المكونات الإلكترونية والمواد المطلوبة للمشروع غير مشمولة في رسوم الخدمة. العميل مسؤول عن توفير المكونات مباشرة أو دفع تكلفة شرائها.' },
+          section3: { title: '3. التسليم والتأخير', content: 'يلتزم فريقنا بتسليم العمل في الموعد المتفق عليه. في حال تأخر تسليم العمل، يُعوَّض العميل بمبلغ 200 ريال عن كل يوم تأخير.' },
+          section4: { title: '4. جلسات الشرح', content: 'مشاريع المقررات: جلسة شرح مجانية واحدة. مشاريع التخرج: اجتماعَين شهريًا بالإضافة إلى جلسة تحضيرية قبل كل عرض. الجلسات الإضافية: 100 ريال لكل جلسة.' },
+          section5: { title: '5. التعديلات', content: 'يحق للعميل طلب إجراء التعديلات على التقارير والعروض التقديمية مجانًا لمرة واحدة. طلبات التعديل اللاحقة تُحتسب بمبلغ 50 ريال لكل ساعة.' },
+          section6: { title: '6. نطاق الخدمات', content: 'يقدم Ohm Hive خدمات التطوير والتنفيذ التقني فقط. نحن لا نقدم أفكار المشاريع ولا نقيّم أفكار العملاء. Ohm Hive غير مسؤول عن قبول أو رفض الفكرة من قبل أي مؤسسة أكاديمية.' },
+          section7: { title: '7. خدمات الاستشارات', content: 'تُحتسب جلسات الاستشارة بمبلغ 80 ريال لكل ساعة. أي مدة تتجاوز ساعة واحدة تُحتسب ساعة إضافية كاملة.' },
+          section8: { title: '8. التواصل', content: 'جميع الاتصالات تتم عبر واتساب أو البريد الإلكتروني أو الاجتماعات عبر الإنترنت فقط. يُشترط الالتزام بالتواصل المهني والمحترم من كلا الطرفين.' },
+          section9: { title: '9. الإنهاء', content: 'عدم الامتثال لهذه الشروط يخول Ohm Hive إنهاء الاتفاقية فورًا. لا يحق للعميل المطالبة باسترداد أي مبالغ مدفوعة.' }
+        }
       }
     };
     const tr = t[lang] || t.en;
@@ -582,151 +610,208 @@ app.get('/api/orders/:orderNumber/pdf', async (req, res) => {
 
     // Receipt title bar
     doc.rect(0, 120, 612, 35).fill(honeyGold);
-    doc.fillColor(darkCharcoal).fontSize(16).font(fontBold).text(tr.receipt, 50, 128, { align: 'center', width: 512 });
+    doc.fillColor(darkCharcoal).fontSize(18).font(fontBold).text(tr.receipt, 50, 126, { align: 'center', width: 512 });
 
     // Order number box
     const leftBoxX = isArabic ? 312 : 50;
     const rightBoxX = isArabic ? 50 : 312;
     doc.rect(leftBoxX, 175, 250, 50).lineWidth(2).stroke(honeyGold);
-    doc.fillColor(darkCharcoal).fontSize(10).font(fontRegular).text(tr.orderNumber, leftBoxX + 10, 182, { align: textAlign, width: 230 });
-    doc.fillColor(honeyGold).fontSize(18).font(fontBold).text(order.order_number, leftBoxX + 10, 198, { align: textAlign, width: 230 });
+    doc.fillColor(darkCharcoal).fontSize(11).font(fontBold).text(tr.orderNumber, leftBoxX + 10, 182, { align: textAlign, width: 230 });
+    doc.fillColor(honeyGold).fontSize(20).font(fontBold).text(order.order_number, leftBoxX + 10, 198, { align: textAlign, width: 230 });
 
     // Date and status box
     doc.rect(rightBoxX, 175, 250, 50).lineWidth(2).stroke(electricBlue);
-    doc.fillColor(darkCharcoal).fontSize(10).font(fontRegular).text(tr.dateStatus, rightBoxX + 10, 182, { align: textAlign, width: 230 });
+    doc.fillColor(darkCharcoal).fontSize(11).font(fontBold).text(tr.dateStatus, rightBoxX + 10, 182, { align: textAlign, width: 230 });
     const dateLocale = isArabic ? 'ar-SA' : 'en-US';
     const orderDate = order.created_at ? new Date(order.created_at).toLocaleDateString(dateLocale, { year: 'numeric', month: 'short', day: 'numeric' }) : 'N/A';
     const statusText = tr.statuses[order.status] || (order.status || 'PENDING').toUpperCase();
-    doc.fillColor(electricBlue).fontSize(12).font(fontBold).text(orderDate + ' | ' + statusText, rightBoxX + 10, 200, { align: textAlign, width: 230 });
+    doc.fillColor(electricBlue).fontSize(14).font(fontBold).text(orderDate + ' | ' + statusText, rightBoxX + 10, 200, { align: textAlign, width: 230 });
 
     // Customer Information Section
-    doc.rect(50, 245, 512, 80).lineWidth(1).stroke('#DDDDDD');
+    doc.rect(50, 245, 512, 70).lineWidth(1).stroke('#DDDDDD');
     doc.rect(50, 245, 512, 25).fill('#F5F5F5');
-    doc.fillColor(darkCharcoal).fontSize(12).font(fontBold).text(tr.customerInfo, 60, 252, { align: textAlign, width: 492 });
+    doc.fillColor(darkCharcoal).fontSize(13).font(fontBold).text(tr.customerInfo, 60, 251, { align: textAlign, width: 492 });
 
-    doc.fillColor('#333333').fontSize(10).font(fontRegular);
+    doc.fillColor('#333333').fontSize(11).font(fontBold);
     if (isArabic) {
-      doc.text(order.first_name + ' ' + order.last_name + ' :' + tr.name.replace(':', ''), 60, 280, { align: 'right', width: 492 });
-      doc.text(order.phone + ' :' + tr.phone.replace(':', ''), 60, 298, { align: 'right', width: 492 });
-      doc.text(order.email + ' :' + tr.email.replace(':', ''), 60, 316, { align: 'right', width: 492 });
+      doc.text(order.first_name + ' ' + order.last_name + ' :' + tr.name.replace(':', ''), 60, 278, { align: 'right', width: 492 });
+      doc.font(fontRegular).text(order.phone + ' :' + tr.phone.replace(':', ''), 60, 295, { align: 'right', width: 492 });
     } else {
-      doc.text(tr.name, 60, 280);
-      doc.font(fontBold).text(order.first_name + ' ' + order.last_name, 120, 280);
-      doc.font(fontRegular).text(tr.phone, 300, 280);
-      doc.font(fontBold).text(order.phone, 360, 280);
-      doc.font(fontRegular).text(tr.email, 60, 300);
-      doc.font(fontBold).text(order.email, 120, 300);
+      doc.text(tr.name + ' ' + order.first_name + ' ' + order.last_name, 60, 278);
+      doc.font(fontRegular).text(tr.phone + ' ' + order.phone + '   |   ' + tr.email + ' ' + order.email, 60, 295);
     }
 
     // Service Details Section
-    doc.rect(50, 345, 512, 100).lineWidth(1).stroke('#DDDDDD');
-    doc.rect(50, 345, 512, 25).fill(honeyGold);
-    doc.fillColor('#FFFFFF').fontSize(12).font(fontBold).text(tr.serviceDetails, 60, 352, { align: textAlign, width: 492 });
+    doc.rect(50, 330, 512, 80).lineWidth(1).stroke('#DDDDDD');
+    doc.rect(50, 330, 512, 25).fill(honeyGold);
+    doc.fillColor('#FFFFFF').fontSize(13).font(fontBold).text(tr.serviceDetails, 60, 336, { align: textAlign, width: 492 });
 
-    doc.fillColor('#333333').fontSize(10).font(fontRegular);
+    doc.fillColor('#333333').fontSize(12).font(fontBold);
     const serviceLabel = tr.services[order.service_type] || order.service_type;
     if (isArabic) {
-      doc.fillColor(honeyGold).font(fontBold).text(serviceLabel + ' :' + tr.serviceType.replace(':', ''), 60, 380, { align: 'right', width: 492 });
+      doc.fillColor(honeyGold).text(serviceLabel + ' :' + tr.serviceType.replace(':', ''), 60, 365, { align: 'right', width: 492 });
     } else {
-      doc.text(tr.serviceType, 60, 380);
-      doc.font(fontBold).fillColor(honeyGold).text(serviceLabel, 150, 380);
+      doc.text(tr.serviceType + ' ' + serviceLabel, 60, 365);
     }
 
-    let yPos = 400;
-    doc.fillColor('#333333');
-    for (const [key, value] of Object.entries(serviceDetails)) {
-      if (value && key !== 'files' && yPos < 440) {
-        const formattedKey = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
-        const displayValue = Array.isArray(value) ? value.join(', ') : String(value);
-        if (isArabic) {
-          doc.font(fontRegular).text(displayValue.substring(0, 50) + ' :' + formattedKey, 60, yPos, { align: 'right', width: 492 });
-        } else {
-          doc.font(fontRegular).text(formattedKey + ':', 60, yPos);
-          doc.font(fontBold).text(displayValue.substring(0, 60), 180, yPos);
-        }
-        yPos += 18;
-      }
-    }
-
-    // Cost Breakdown Section
-    doc.rect(50, 465, 512, 100).lineWidth(1).stroke('#DDDDDD');
-    doc.rect(50, 465, 512, 25).fill(electricBlue);
-    doc.fillColor('#FFFFFF').fontSize(12).font(fontBold).text(tr.costBreakdown, 60, 472, { align: textAlign, width: 492 });
-
-    yPos = 500;
+    let yPos = 385;
     doc.fillColor('#333333').fontSize(10);
-
-    // Calculate extras total (report, ppt, etc.)
-    let extrasTotal = 0;
-    for (const [key, value] of Object.entries(calculatedCosts)) {
-      if (value && typeof value === 'number' && value > 0) {
-        extrasTotal += value;
-        if (yPos < 550) {
-          const formattedKey = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
-          if (isArabic) {
-            doc.font(fontBold).text('SAR ' + value, 60, yPos);
-            doc.font(fontRegular).text(formattedKey, 200, yPos, { align: 'right', width: 350 });
-          } else {
-            doc.font(fontRegular).text(formattedKey, 60, yPos);
-            doc.font(fontBold).text(value + ' SAR', 450, yPos, { align: 'right', width: 100 });
-          }
-          yPos += 18;
+    for (const [key, value] of Object.entries(serviceDetails)) {
+      if (value && key !== 'files' && yPos < 405) {
+        const formattedKey = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+        const displayValue = Array.isArray(value) ? value.join(', ') : String(value).substring(0, 60);
+        if (isArabic) {
+          doc.font(fontRegular).text(displayValue + ' :' + formattedKey, 60, yPos, { align: 'right', width: 492 });
+        } else {
+          doc.font(fontRegular).text(formattedKey + ': ' + displayValue, 60, yPos);
         }
+        yPos += 16;
       }
     }
 
-    // Calculate final total: base cost (from engineer) + extras
-    let finalTotal = null;
+    // Cost Breakdown Section - Itemized
+    const costSectionY = 425;
+    const costItems = [];
+
+    // Add base cost if set
     if (order.total_cost) {
-      finalTotal = order.total_cost + extrasTotal;
+      costItems.push({ label: tr.baseCost, value: order.total_cost });
+    }
+
+    // Add all calculated costs (report, ppt, consulting, supervision, modeling, etc.)
+    for (const [key, value] of Object.entries(calculatedCosts)) {
+      if (value && typeof value === 'number' && value > 0 && key !== 'modelingHours') {
+        let label = key;
+        if (key === 'report') label = tr.report;
+        else if (key === 'ppt') label = tr.ppt;
+        else if (key === 'consulting') label = tr.consulting;
+        else if (key === 'supervision') label = tr.supervision;
+        else if (key === 'modeling') label = tr.modeling;
+        else label = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+        costItems.push({ label, value });
+      }
+    }
+
+    // If modeling hours exist, show that info
+    if (calculatedCosts.modelingHours) {
+      costItems.push({ label: tr.modelingHours + ' (' + calculatedCosts.modelingHours + ' x 50 SAR)', value: calculatedCosts.modeling || (calculatedCosts.modelingHours * 50) });
+    }
+
+    const costBoxHeight = Math.max(80, 30 + costItems.length * 20 + 30);
+    doc.rect(50, costSectionY, 512, costBoxHeight).lineWidth(1).stroke('#DDDDDD');
+    doc.rect(50, costSectionY, 512, 25).fill(electricBlue);
+    doc.fillColor('#FFFFFF').fontSize(13).font(fontBold).text(tr.costBreakdown, 60, costSectionY + 6, { align: textAlign, width: 492 });
+
+    yPos = costSectionY + 35;
+    doc.fillColor('#333333').fontSize(11);
+
+    // Draw each cost item
+    for (const item of costItems) {
+      if (isArabic) {
+        doc.font(fontBold).text(item.value + ' SAR', 60, yPos);
+        doc.font(fontRegular).text(item.label, 200, yPos, { align: 'right', width: 350 });
+      } else {
+        doc.font(fontRegular).text(item.label, 70, yPos);
+        doc.font(fontBold).text(item.value + ' SAR', 420, yPos, { align: 'right', width: 130 });
+      }
+      yPos += 20;
+    }
+
+    // Calculate final total
+    let finalTotal = 0;
+    for (const item of costItems) {
+      finalTotal += item.value;
     }
 
     // Total line
-    doc.moveTo(50, 555).lineTo(562, 555).lineWidth(2).stroke(honeyGold);
+    const totalLineY = costSectionY + costBoxHeight - 25;
+    doc.moveTo(60, totalLineY).lineTo(552, totalLineY).lineWidth(2).stroke(honeyGold);
     doc.fontSize(14).font(fontBold);
     if (isArabic) {
-      if (finalTotal) {
-        doc.fillColor(honeyGold).text('SAR ' + finalTotal, 60, 562);
+      if (finalTotal > 0) {
+        doc.fillColor(honeyGold).text(finalTotal + ' SAR', 60, totalLineY + 7);
       } else {
-        doc.fillColor(electricBlue).fontSize(11).text(tr.tbd, 60, 564);
+        doc.fillColor(electricBlue).fontSize(12).text(tr.tbd, 60, totalLineY + 7);
       }
-      doc.fillColor(darkCharcoal).fontSize(14).text(tr.total, 400, 562, { align: 'right', width: 150 });
+      doc.fillColor(darkCharcoal).fontSize(14).text(tr.total, 400, totalLineY + 7, { align: 'right', width: 150 });
     } else {
-      doc.fillColor(darkCharcoal).text(tr.total, 60, 562);
-      if (finalTotal) {
-        doc.fillColor(honeyGold).text(finalTotal + ' SAR', 400, 562, { align: 'right', width: 150 });
+      doc.fillColor(darkCharcoal).text(tr.total, 70, totalLineY + 7);
+      if (finalTotal > 0) {
+        doc.fillColor(honeyGold).text(finalTotal + ' SAR', 420, totalLineY + 7, { align: 'right', width: 130 });
       } else {
-        doc.fillColor(electricBlue).fontSize(11).text(tr.tbd, 250, 564, { align: 'right', width: 300 });
+        doc.fillColor(electricBlue).fontSize(12).text(tr.tbd, 420, totalLineY + 7, { align: 'right', width: 130 });
       }
     }
-
-    // Terms box
-    const termsBoxX = isArabic ? 210 : 50;
-    doc.rect(termsBoxX, 590, 350, 80).lineWidth(1).stroke('#DDDDDD').fill('#FAFAFA');
-    doc.fillColor('#666666').fontSize(9).font(fontBold).text(tr.keyTerms, termsBoxX + 8, 598, { align: textAlign, width: 334 });
-    doc.font(fontRegular).fontSize(8);
-    doc.text(tr.term1, termsBoxX + 8, 614, { align: textAlign, width: 334 });
-    doc.text(tr.term2, termsBoxX + 8, 628, { align: textAlign, width: 334 });
-    doc.text(tr.term3, termsBoxX + 8, 642, { align: textAlign, width: 334 });
-    doc.text(tr.term4, termsBoxX + 8, 656, { align: textAlign, width: 334 });
 
     // Signature box
-    const sigBoxX = isArabic ? 50 : 420;
+    const sigStartY = costSectionY + costBoxHeight + 15;
     if (order.signature && order.signature.startsWith('data:image')) {
-      doc.rect(sigBoxX, 590, 142, 80).lineWidth(1).stroke('#DDDDDD');
-      doc.fillColor('#666666').fontSize(9).font(fontBold).text(tr.signature, sigBoxX + 8, 598, { align: textAlign, width: 126 });
+      doc.rect(50, sigStartY, 200, 70).lineWidth(1).stroke('#DDDDDD');
+      doc.fillColor('#666666').fontSize(11).font(fontBold).text(tr.signature, 60, sigStartY + 8, { align: textAlign, width: 180 });
       try {
-        doc.image(order.signature, sigBoxX + 10, 615, { width: 120, height: 50 });
+        doc.image(order.signature, 60, sigStartY + 25, { width: 170, height: 40 });
       } catch (e) {
-        doc.font(fontRegular).text('[Signature on file]', sigBoxX + 10, 635);
+        doc.font(fontRegular).text('[Signature on file]', 60, sigStartY + 40);
       }
     }
 
-    // Footer
-    doc.rect(0, 700, 612, 92).fill(darkCharcoal);
+    // Footer on page 1
+    doc.rect(0, 720, 612, 72).fill(darkCharcoal);
+    doc.fillColor('#AAAAAA').fontSize(10).font(fontRegular);
+    doc.text(tr.footer1, 50, 735, { align: 'center', width: 512 });
+    doc.text(tr.footer2 + new Date().toLocaleDateString(dateLocale) + ' | OHM HIVE', 50, 752, { align: 'center', width: 512 });
+
+    // ========== PAGE 2: TERMS AND CONDITIONS ==========
+    doc.addPage();
+
+    // Header for terms page
+    doc.rect(0, 0, 612, 80).fill(darkCharcoal);
+    doc.fillColor(honeyGold).fontSize(24).font(fontBold).text('OHM HIVE', 50, 25, { align: 'center', width: 512 });
+    doc.fillColor('#FFFFFF').fontSize(16).font(fontBold).text(tr.terms.title, 50, 55, { align: 'center', width: 512 });
+
+    // Terms content
+    let termsY = 100;
+    const termSections = ['section1', 'section2', 'section3', 'section4', 'section5', 'section6', 'section7', 'section8', 'section9'];
+
+    doc.fillColor('#333333');
+    for (const section of termSections) {
+      if (termsY > 700) {
+        doc.addPage();
+        termsY = 50;
+      }
+
+      const term = tr.terms[section];
+
+      // Section title
+      doc.fontSize(12).font(fontBold).fillColor(honeyGold);
+      if (isArabic) {
+        doc.text(term.title, 50, termsY, { align: 'right', width: 512 });
+      } else {
+        doc.text(term.title, 50, termsY);
+      }
+      termsY += 20;
+
+      // Section content
+      doc.fontSize(10).font(fontRegular).fillColor('#333333');
+      if (isArabic) {
+        doc.text(term.content, 50, termsY, { align: 'right', width: 512, lineGap: 3 });
+      } else {
+        doc.text(term.content, 50, termsY, { width: 512, lineGap: 3 });
+      }
+
+      // Calculate height of text and move position
+      const textHeight = doc.heightOfString(term.content, { width: 512, lineGap: 3 });
+      termsY += textHeight + 20;
+    }
+
+    // Final footer
+    if (termsY > 700) {
+      doc.addPage();
+      termsY = 50;
+    }
+    doc.rect(0, 720, 612, 72).fill(darkCharcoal);
     doc.fillColor('#AAAAAA').fontSize(9).font(fontRegular);
-    doc.text(tr.footer1, 50, 715, { align: 'center', width: 512 });
-    doc.text(tr.footer2 + new Date().toLocaleDateString(dateLocale) + ' | OHM HIVE', 50, 735, { align: 'center', width: 512 });
+    doc.text('OHM HIVE - Where Ideas Buzz to Life | WhatsApp: 0536113736', 50, 745, { align: 'center', width: 512 });
 
     doc.end();
   } catch (error) {

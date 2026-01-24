@@ -302,16 +302,16 @@ function renderConsultingFields() {
   `;
 }
 
-// Supervision pricing per month (distributed from 2,500 to 8,000 SAR)
+// Supervision pricing per month (distributed from 1,800 to 6,500 SAR)
 const supervisionPrices = {
-  1: 2500,
-  2: 3300,
-  3: 4000,
-  4: 4700,
-  5: 5400,
-  6: 6100,
-  7: 7000,
-  8: 8000
+  1: 1800,
+  2: 2500,
+  3: 3150,
+  4: 3800,
+  5: 4500,
+  6: 5150,
+  7: 5850,
+  8: 6500
 };
 
 function renderSupervisionFields() {
@@ -346,6 +346,9 @@ function render3DModelingFields() {
       <label data-i18n="form.modelDescription">${getTranslation('form.modelDescription')}</label>
       <textarea id="modelDescription" name="modelDescription" placeholder="${getTranslation('form.modelDescriptionPlaceholder')}" required></textarea>
     </div>
+    <p style="color: var(--electric-blue); font-size: 0.9rem; margin-top: 15px; padding: 15px; background: rgba(45, 156, 219, 0.1); border-radius: 8px; border: 1px solid rgba(45, 156, 219, 0.3);">
+      ${currentLang === 'ar' ? 'التكلفة: 50 ريال لكل ساعة (سيتم تحديد عدد الساعات من قبل المهندس بعد مراجعة الطلب)' : 'Cost: 50 SAR per hour (hours will be determined by the engineer after reviewing the request)'}
+    </p>
   `;
 }
 

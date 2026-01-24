@@ -1110,16 +1110,30 @@
             <div class="detail-section">
               <h3>${t('costBreakdown')}</h3>
               ${order.total_cost ? `<div class="detail-row"><span class="label">${currentLang === 'ar' ? 'التكلفة الأساسية' : 'Base Cost'}</span><span class="value">${order.total_cost} SAR</span></div>` : ''}
-              ${Object.entries(costs).map(([key, value]) => `<div class="detail-row"><span class="label">${formatLabel(key)}</span><span class="value">${value} SAR</span></div>`).join('')}
+              ${Object.entries(costs).map(([key, value]) => {
+                if (typeof value !== 'number') return '';
+                return `<div class="detail-row"><span class="label">${formatLabel(key)}</span><span class="value">${value} SAR</span></div>`;
+              }).join('')}
               <div class="detail-row" style="border-top: 2px solid var(--honey-gold); margin-top: 10px; padding-top: 15px;">
                 <span class="label"><strong>${t('totalCost')}</strong></span>
                 <span class="value"><strong>${calculateFinalTotal(order) ? calculateFinalTotal(order) + ' SAR' : t('toBeDetemined')}</strong></span>
               </div>
+              ${order.service_type === '3d-modeling' ? `
+              <div class="cost-update" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(245, 166, 35, 0.2);">
+                <label style="color: var(--honey-gold); margin-bottom: 10px; display: block;">${currentLang === 'ar' ? 'ساعات التصميم (50 ريال/ساعة)' : 'Design Hours (50 SAR/hour)'}</label>
+                <input type="number" id="modelingHoursInput" placeholder="${currentLang === 'ar' ? 'عدد الساعات' : 'Hours'}" value="${costs.modelingHours || ''}" min="0" step="0.5">
+                <span>${currentLang === 'ar' ? 'ساعة' : 'hrs'}</span>
+                <button class="btn btn-primary" onclick="updateModelingHours(${order.id})">
+                  ${currentLang === 'ar' ? 'حفظ الساعات' : 'Save Hours'}
+                </button>
+              </div>
+              ` : `
               <div class="cost-update">
                 <input type="number" id="totalCostInput" placeholder="${t('setTotalCost')}" value="${order.total_cost || ''}">
                 <span>SAR</span>
                 <button class="btn btn-primary" onclick="updateCost(${order.id})">${t('updateCost')}</button>
               </div>
+              `}
             </div>
 
             ${order.files && order.files.length > 0 ? `
@@ -1185,6 +1199,31 @@
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ totalCost: parseFloat(totalCost) })
+        });
+        alert(t('costUpdated'));
+        closeModal();
+        loadOrders();
+      } catch (error) {
+        if (error.message !== 'Unauthorized') alert(t('errorUpdatingCost'));
+      }
+    }
+
+    async function updateModelingHours(orderId) {
+      const hours = parseFloat(document.getElementById('modelingHoursInput').value) || 0;
+      const modelingCost = hours * 50;
+      try {
+        // Get current order to preserve existing calculated_costs
+        const order = allOrders.find(o => o.id === orderId);
+        const currentCosts = order?.calculated_costs || {};
+        const updatedCosts = { ...currentCosts, modelingHours: hours, modeling: modelingCost };
+
+        await apiRequest(`/api/orders/${orderId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            totalCost: modelingCost,
+            calculatedCosts: updatedCosts
+          })
         });
         alert(t('costUpdated'));
         closeModal();
