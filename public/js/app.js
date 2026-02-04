@@ -277,14 +277,14 @@ function renderSeniorProjectFields() {
     <div class="form-group">
       <label data-i18n="form.reportRequired">${getTranslation('form.reportRequired')}</label>
       <div class="radio-group">
-        <label><input type="radio" name="reportRequired" value="yes" onchange="updateCostSummary()"> ${getTranslation('form.yes')} (+1200 SAR)</label>
+        <label><input type="radio" name="reportRequired" value="yes" onchange="updateCostSummary()"> ${getTranslation('form.yes')} (+700 SAR)</label>
         <label><input type="radio" name="reportRequired" value="no" checked onchange="updateCostSummary()"> ${getTranslation('form.no')}</label>
       </div>
     </div>
     <div class="form-group">
       <label data-i18n="form.pptRequired">${getTranslation('form.pptRequired')}</label>
       <div class="radio-group">
-        <label><input type="radio" name="pptRequired" value="yes" onchange="updateCostSummary()"> ${getTranslation('form.yes')} (+400 SAR)</label>
+        <label><input type="radio" name="pptRequired" value="yes" onchange="updateCostSummary()"> ${getTranslation('form.yes')} (+300 SAR)</label>
         <label><input type="radio" name="pptRequired" value="no" checked onchange="updateCostSummary()"> ${getTranslation('form.no')}</label>
       </div>
     </div>
@@ -334,6 +334,20 @@ function renderSupervisionFields() {
             </label>
           </div>
         `).join('')}
+      </div>
+    </div>
+    <div class="form-group">
+      <label data-i18n="form.reportRequired">${getTranslation('form.reportRequired')}</label>
+      <div class="radio-group">
+        <label><input type="radio" name="reportRequired" value="yes" onchange="updateCostSummary()"> ${getTranslation('form.yes')} (+700 SAR)</label>
+        <label><input type="radio" name="reportRequired" value="no" checked onchange="updateCostSummary()"> ${getTranslation('form.no')}</label>
+      </div>
+    </div>
+    <div class="form-group">
+      <label data-i18n="form.pptRequired">${getTranslation('form.pptRequired')}</label>
+      <div class="radio-group">
+        <label><input type="radio" name="pptRequired" value="yes" onchange="updateCostSummary()"> ${getTranslation('form.yes')} (+300 SAR)</label>
+        <label><input type="radio" name="pptRequired" value="no" checked onchange="updateCostSummary()"> ${getTranslation('form.no')}</label>
       </div>
     </div>
   `;
@@ -494,12 +508,12 @@ function updateCostSummary() {
       costs.baseCost = getTranslation('form.toBeDetemined');
       hasTBD = true;
       if (document.querySelector('input[name="reportRequired"]:checked')?.value === 'yes') {
-        costs.report = 1200;
-        total += 1200;
+        costs.report = 700;
+        total += 700;
       }
       if (document.querySelector('input[name="pptRequired"]:checked')?.value === 'yes') {
-        costs.ppt = 400;
-        total += 400;
+        costs.ppt = 300;
+        total += 300;
       }
       break;
 
@@ -511,8 +525,16 @@ function updateCostSummary() {
 
     case 'supervision':
       const months = parseInt(document.querySelector('input[name="supervisionPeriod"]:checked')?.value) || 1;
-      costs.supervision = supervisionPrices[months] || 2500;
+      costs.supervision = supervisionPrices[months] || 1800;
       total = costs.supervision;
+      if (document.querySelector('input[name="reportRequired"]:checked')?.value === 'yes') {
+        costs.report = 700;
+        total += 700;
+      }
+      if (document.querySelector('input[name="pptRequired"]:checked')?.value === 'yes') {
+        costs.ppt = 300;
+        total += 300;
+      }
       break;
 
     case '3d-modeling':
@@ -826,10 +848,10 @@ function collectCalculatedCosts(serviceType) {
     case 'senior-project':
       // Base cost is TBD, only extras are calculated
       if (document.querySelector('input[name="reportRequired"]:checked')?.value === 'yes') {
-        costs.report = 1200;
+        costs.report = 700;
       }
       if (document.querySelector('input[name="pptRequired"]:checked')?.value === 'yes') {
-        costs.ppt = 400;
+        costs.ppt = 300;
       }
       // Total remains null (TBD) because base project cost is unknown
       break;
@@ -842,8 +864,16 @@ function collectCalculatedCosts(serviceType) {
 
     case 'supervision':
       const supervisionMonths = parseInt(document.querySelector('input[name="supervisionPeriod"]:checked')?.value) || 1;
-      costs.supervision = supervisionPrices[supervisionMonths] || 2500;
+      costs.supervision = supervisionPrices[supervisionMonths] || 1800;
       total = costs.supervision; // Fixed rate, total is known
+      if (document.querySelector('input[name="reportRequired"]:checked')?.value === 'yes') {
+        costs.report = 700;
+        total += 700;
+      }
+      if (document.querySelector('input[name="pptRequired"]:checked')?.value === 'yes') {
+        costs.ppt = 300;
+        total += 300;
+      }
       break;
 
     case '3d-modeling':
